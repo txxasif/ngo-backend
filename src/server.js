@@ -1,19 +1,17 @@
+require("dotenv").config();
 const http = require("http");
 const app = require("./app");
 const mongoose = require("mongoose");
+const connectDB = require("./config/dbConnection");
 const server = http.createServer(app);
-const mongodb_url =
-  "mongodb+srv://agrobd:Asif8377@agrobd.joapcha.mongodb.net/ngo?retryWrites=true&w=majority";
+const port = process.env.PORT || 5000;
+
+connectDB();
+
 mongoose.connection.once("open", () => {
   console.log("done");
+  server.listen(port);
 });
-mongoose.connection.once("error", (err) => {
+mongoose.connection.on("error", (err) => {
   console.log(err);
 });
-async function startServer() {
-  await mongoose.connect(mongodb_url).then(() => {
-    console.log("done");
-  });
-  server.listen(5000);
-}
-startServer();
