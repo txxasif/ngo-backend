@@ -2,19 +2,16 @@
     "version": 2,
     "builds": [
       {
-        "src": "src/server.js", // Specify the entry point of your application
-        "use": "@vercel/node" // Use the @vercel/node builder for Node.js applications
+        "src": "src/server.js",
+        "use": "@vercel/node" 
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "src/server.js" // Route all incoming requests to your server entry point
+        "dest": "src/server.js"
       }
-    ],
-    "env": {
-      "MONGODB_URI": "@mongo_uri", // Define environment variables used in your application
-      "JWT_SECRET": "@jwt_secret"
-    }
+    ]
+  
   }
   
