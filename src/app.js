@@ -8,6 +8,7 @@ const morgan = require("morgan");
 const userRoute = require("./routes/userRoute");
 const userAuthRoute = require("./routes/authRoute");
 const branchRoute = require("./routes/branchRoute");
+const samityRoute = require("./routes/samityRoute");
 app.use(cors());
 app.use(morgan("combined"));
 app.use("/", express.static(path.join(__dirname, "/public")));
@@ -17,6 +18,7 @@ app.use("/user", userRoute);
 app.use("/auth", userAuthRoute);
 
 app.use("/branch", branchRoute);
+app.use("/samity", samityRoute);
 
 app.all("*", (req, res) => {
   res.status(404);
