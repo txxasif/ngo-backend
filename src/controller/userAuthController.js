@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../model/User.Schema");
 const jwt = require("jsonwebtoken");
+
 const loginHandler = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
   const foundUser = await User.findOne({ username: username }).exec();
@@ -31,12 +32,9 @@ const loginHandler = asyncHandler(async (req, res) => {
   );
   return res.json({ username: foundUser.username, accessToken, refreshToken });
 });
-const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Import your User model here
 
 const refreshAccessTokenController = (req, res) => {
-  const refreshToken = req.body.refreshToken; // Assuming refresh token is sent in the request body
-
+  const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token is required" });
   }

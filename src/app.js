@@ -7,6 +7,7 @@ const corsOptions = require("./config/corsOptions");
 const morgan = require("morgan");
 const userRoute = require("./routes/userRoute");
 const userAuthRoute = require("./routes/authRoute");
+const branchRoute = require("./routes/branchRoute");
 app.use(cors());
 app.use(morgan("combined"));
 app.use("/", express.static(path.join(__dirname, "/public")));
@@ -14,6 +15,8 @@ app.use(express.json());
 
 app.use("/user", userRoute);
 app.use("/auth", userAuthRoute);
+
+app.use("/branch", branchRoute);
 
 app.all("*", (req, res) => {
   res.status(404);
