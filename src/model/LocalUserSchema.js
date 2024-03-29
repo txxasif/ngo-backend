@@ -1,31 +1,25 @@
 const mongoose = require("mongoose");
-const AutoIncrement = require("mongoose-sequence")(mongoose);
-
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-}).plugin(AutoIncrement, {
-  inc_field: "userId",
-  id: "ticketNums",
-  start_seq: 500,
-});
-
-const User = mongoose.models.User || mongoose.model("User", userSchema);
-module.exports = User;
-
-const mongoose = require("mongoose");
 
 const memberSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
+  fromAdmin: {
+    type: Boolean,
+    required: true,
+  },
+  branchId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Branch",
+    required: true,
+  },
+  samityId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Samity",
+    required: true,
+  },
+
   fathersName: {
     type: String,
   },
@@ -96,7 +90,7 @@ const memberSchema = new mongoose.Schema({
       share: {
         type: Number,
         min: 0,
-        max: 100, // Ensures share percentage is between 0 and 100
+        max: 100,
       },
       occupation: {
         type: String,
@@ -105,4 +99,6 @@ const memberSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Member", memberSchema);
+const LocalUser =
+  mongoose.models.LocalUser || mongoose.model("LocalUser", memberSchema);
+module.exports = LocalUser;

@@ -13,7 +13,7 @@ const createNewUser = asyncHandler(async (req, res) => {
   const newUser2 = await User.create(newUser);
 
   if (newUser2) {
-    return res.status(200).json({ message: "use created" });
+    return res.status(200).json({ message: "user created" });
   }
 });
 

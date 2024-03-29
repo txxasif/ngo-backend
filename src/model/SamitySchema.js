@@ -10,7 +10,6 @@ const samitySchema = new mongoose.Schema({
     unique: true,
     uppercase: true,
   },
-
   address: {
     type: String,
     required: true,
