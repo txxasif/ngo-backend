@@ -37,6 +37,8 @@ const addSamityController = asyncHandler(async (req, res) => {
   }
   return res.json({ message: "Samity Created Successfully", samityBody });
 });
+
+// ! getAllSamityControllerByBranchId
 const getAllSamityControllerByBranchId = asyncHandler(async (req, res) => {
   const branchId = req.params.branchId;
   console.log(branchId);
