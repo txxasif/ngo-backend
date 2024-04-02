@@ -85,5 +85,9 @@ const depositAccountSchema = new mongoose.Schema(
 const DepositAccount =
   mongoose.models.DepositAccount ||
   mongoose.model("DepositAccount", depositAccountSchema);
-
-module.exports = DepositAccount;
+const Transaction =
+  mongoose.models.Transaction ||
+  mongoose.model("Transaction", transactionSchema);
+const Withdraw =
+  mongoose.models.Withdraw || mongoose.model("Withdraw", withdrawSchema);
+module.exports = { DepositAccount, Withdraw, Transaction };
