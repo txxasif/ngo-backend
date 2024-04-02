@@ -40,11 +40,15 @@ const searchDepositAccountController = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: "No user data available" });
   }
-  const isDepositAccount = await DepositAccount.findOne({ memberId: user._id });
+  const isDepositAccount = await DepositAccount.findOne({
+    memberId: user._id,
+  }).lean();
   if (!isDepositAccount) {
     return res.status(404).json({ message: "No Deposit Account Available" });
   }
-  return res.status(200).json({ data: user });
+  console.log(isDepositAccount);
+  const finalResponse = { ...user, ...isDepositAccount };
+  return res.status(200).json({ data: [finalResponse] });
 });
 const makeDepositController = asyncHandler(async (req, res) => {});
 module.exports = {

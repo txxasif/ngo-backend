@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { type } = require("../schemaValidation/localUser");
 // Transaction Schema
 const transactionSchema = new mongoose.Schema({
   date: {
@@ -7,6 +8,10 @@ const transactionSchema = new mongoose.Schema({
   },
   amount: {
     type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
     required: true,
   },
 });
@@ -72,6 +77,7 @@ const depositAccountSchema = new mongoose.Schema(
     withdraws: [withdrawSchema],
     balance: {
       type: Number,
+      default: 0,
     },
     isOpen: {
       type: Boolean,
