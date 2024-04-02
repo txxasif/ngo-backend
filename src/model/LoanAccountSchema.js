@@ -10,17 +10,8 @@ const transactionSchema = new mongoose.Schema({
     required: true,
   },
 });
-const withdrawSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-});
-const depositAccountSchema = new mongoose.Schema(
+
+const loanAccountSchema = new mongoose.Schema(
   {
     memberId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,11 +31,7 @@ const depositAccountSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    periodOfTimeInMonths: {
-      type: Number,
-      required: true,
-    },
-    perInstallment: {
+    loanAmount: {
       type: Number,
       required: true,
     },
@@ -52,7 +39,15 @@ const depositAccountSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    onMatureAmount: {
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    numberOfInstallment: {
+      type: Number,
+      required: true,
+    },
+    installmentAmount: {
       type: Number,
       required: true,
     },
@@ -60,7 +55,7 @@ const depositAccountSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    matureDate: {
+    expiryDate: {
       type: Date,
       required: true,
     },
@@ -69,7 +64,6 @@ const depositAccountSchema = new mongoose.Schema(
     //   required: true,
     // },
     transactions: [transactionSchema],
-    withdraws: [withdrawSchema],
     balance: {
       type: Number,
     },
@@ -82,12 +76,11 @@ const depositAccountSchema = new mongoose.Schema(
   }
 );
 
-const DepositAccount =
-  mongoose.models.DepositAccount ||
-  mongoose.model("DepositAccount", depositAccountSchema);
+const LoanAccount =
+  mongoose.models.LoanAccount ||
+  mongoose.model("LoanAccount", loanAccountSchema);
 const Transaction =
   mongoose.models.Transaction ||
   mongoose.model("Transaction", transactionSchema);
-const Withdraw =
-  mongoose.models.Withdraw || mongoose.model("Withdraw", withdrawSchema);
-module.exports = { DepositAccount, Withdraw, Transaction };
+
+module.exports = { LoanAccount, Transaction };
