@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const LocalUser = require("../../model/LocalUserSchema");
 const localUserSchema = require("../../schemaValidation/localUser");
 
-// !add brunch controller
+// * add brunch controller
 const addLocalUserController = asyncHandler(async (req, res) => {
   const localUserBody = req.body;
   const { error, value } = localUserSchema.validate(localUserBody);
@@ -20,7 +20,7 @@ const addLocalUserController = asyncHandler(async (req, res) => {
   await newLocalUser.save();
   return res.json({ message: "User Create Successfully" }).status(200);
 });
-// !get user by phone number
+// * get user by phone number
 const getUserByPhoneNumberController = asyncHandler(async (req, res) => {
   const phoneNumber = req.params.id;
   const user = await LocalUser.aggregate([
@@ -76,7 +76,7 @@ const getUserByPhoneNumberController = asyncHandler(async (req, res) => {
   ]);
   return res.send({ data: user });
 });
-// !get users by branch and samity id
+// * get users by branch and samity id
 const getUsersByBranchAndSamityId = asyncHandler(async (req, res) => {
   const branchId = req.query.branch;
   const samityId = req.query.samity;
