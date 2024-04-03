@@ -46,12 +46,27 @@ const searchDepositAccountController = asyncHandler(async (req, res) => {
   if (!isDepositAccount) {
     return res.status(404).json({ message: "No Deposit Account Available" });
   }
-  console.log(isDepositAccount);
+  delete isDepositAccount._id;
   const finalResponse = { ...user, ...isDepositAccount };
   return res.status(200).json({ data: [finalResponse] });
 });
-const makeDepositController = asyncHandler(async (req, res) => {});
+const makeDepositController = asyncHandler(async (req, res) => {
+  const { date, amount, description, memberId } = req.body;
+  if (!date || !amount || !description || !memberId) {
+    return res.status(404).json({ message: "All Fields are Required" });
+  }
+  const depositAccount = await DepositAccount.findOne({ memberId: memberId });
+  if (!depositAccount) {
+    return res.status(404).json({ error: "Deposit account not found" });
+  }
+  depositAccount.balance += Number(amount);
+  const transaction = new Transaction({ date, amount, description });
+  depositAccount.transactions.push(transaction);
+  await depositAccount.save();
+  return res.status(200).json({ message: "Deposit money saved successfully" });
+});
 module.exports = {
   createDepositAccountController,
+  makeDepositController,
   searchDepositAccountController,
 };

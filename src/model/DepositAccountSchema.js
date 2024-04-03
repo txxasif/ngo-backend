@@ -1,30 +1,39 @@
 const mongoose = require("mongoose");
 const { type } = require("../schemaValidation/localUser");
 // Transaction Schema
-const transactionSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
+const transactionSchema = new mongoose.Schema(
+  {
+    date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
   },
-  amount: {
-    type: Number,
-    required: true,
+  {
+    timestamps: true,
+  }
+);
+const withdrawSchema = new mongoose.Schema(
+  {
+    date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
   },
-  description: {
-    type: String,
-    required: true,
-  },
-});
-const withdrawSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 const depositAccountSchema = new mongoose.Schema(
   {
     memberId: {
@@ -69,10 +78,6 @@ const depositAccountSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    // firstDueDate: {
-    //   type: Date,
-    //   required: true,
-    // },
     transactions: [transactionSchema],
     withdraws: [withdrawSchema],
     balance: {
