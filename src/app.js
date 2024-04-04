@@ -11,6 +11,7 @@ const branchRoute = require("./routes/branchRoute");
 const samityRoute = require("./routes/samityRoute");
 const localUserRoute = require("./routes/localUserRoute");
 const depositRoute = require("./routes/depositRoute");
+const loanRoute = require("./routes/loanRoute");
 app.use(cors());
 app.use(morgan("combined"));
 app.use("/", express.static(path.join(__dirname, "/public")));
@@ -23,6 +24,7 @@ app.use("/branch", branchRoute);
 app.use("/samity", samityRoute);
 app.use("/localuser", localUserRoute);
 app.use("/deposit", depositRoute);
+app.use("/loan", loanRoute);
 
 app.all("*", (req, res) => {
   res.status(404);

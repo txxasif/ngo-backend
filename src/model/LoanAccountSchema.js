@@ -55,20 +55,18 @@ const loanAccountSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    periodOfTimeInMonths: {
+      type: Number,
+      required: true,
+    },
     expiryDate: {
       type: Date,
       required: true,
     },
-    // firstDueDate: {
-    //   type: Date,
-    //   required: true,
-    // },
+
     transactions: [transactionSchema],
-    balance: {
+    paid: {
       type: Number,
-    },
-    isOpen: {
-      type: Boolean,
     },
   },
   {

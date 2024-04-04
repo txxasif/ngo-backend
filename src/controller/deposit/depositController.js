@@ -65,8 +65,53 @@ const makeDepositController = asyncHandler(async (req, res) => {
   await depositAccount.save();
   return res.status(200).json({ message: "Deposit money saved successfully" });
 });
+
+// * withdrawAccount
+const withdrawController = asyncHandler(async (req, res) => {
+  const { memberId, amount } = req.body;
+
+  // Validate memberId and amount
+  if (!memberId || !amount || isNaN(amount) || amount <= 0) {
+    return res.status(400).json({ message: "Invalid memberId or amount" });
+  }
+
+  // Find the deposit account by memberId
+  let depositAccount = await DepositAccount.findOne({ memberId });
+
+  if (!depositAccount) {
+    return res.status(404).json({ message: "Deposit account not found" });
+  }
+
+  // Ensure sufficient balance for withdrawal
+  if (amount > depositAccount.balance) {
+    return res
+      .status(400)
+      .json({ message: "Insufficient balance for withdrawal" });
+  }
+
+  // Update balance
+  depositAccount.balance -= Number(amount);
+
+  // Create a new withdrawal
+  const withdrawal = new Withdraw({
+    date: new Date(),
+    amount,
+  });
+
+  // Add the withdrawal to deposit account
+  depositAccount.withdraws.push(withdrawal);
+
+  // Save the updated deposit account
+  await depositAccount.save();
+
+  // Return success response
+  return res
+    .status(200)
+    .json({ message: "Withdrawal successful", depositAccount });
+});
 module.exports = {
   createDepositAccountController,
   makeDepositController,
   searchDepositAccountController,
+  withdrawController,
 };
