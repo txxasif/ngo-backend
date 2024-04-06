@@ -67,6 +67,7 @@ const loanAccountSchema = new mongoose.Schema(
     transactions: [transactionSchema],
     paid: {
       type: Number,
+      default: 0,
     },
   },
   {
