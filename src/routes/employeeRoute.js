@@ -1,10 +1,14 @@
 const express = require("express");
+const {
+  createEmployeeController,
+  searchEmployeeController,
+  setEmployeeCredentialsCredentialsController,
+} = require("../controller/emoloyee/employeeController");
 
 const employeeRoute = express.Router();
 
-employeeRoute.post("/create", createNewLoanAccountController);
-// employeeRoute.post("/makeDeposit", makeDepositController);
-// employeeRoute.post("/makeWithdraw", withdrawController);
-employeeRoute.get("/search/:id", searchLoanAccountController);
+employeeRoute.post("/create", createEmployeeController);
+employeeRoute.post("/credentials", setEmployeeCredentialsCredentialsController);
+employeeRoute.get("/search/:id", searchEmployeeController);
 
 module.exports = employeeRoute;

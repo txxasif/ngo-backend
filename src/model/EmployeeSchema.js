@@ -7,8 +7,19 @@ const employeeSchema = new Schema({
   motherName: String,
   presentAddress: String,
   permanentAddress: String,
+  password: String,
+  branchId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Branch",
+    required: true,
+  },
+  samityId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Samity",
+    required: true,
+  },
   educationalQualification: String,
-  dateOfBirth: Date, // Assuming dateOfBirth is a date
+  dateOfBirth: Date,
   mobileNumber: String,
   email: String,
   emergencyContactNumber: String,
@@ -18,16 +29,14 @@ const employeeSchema = new Schema({
   previousOrganization: {
     name: String,
     address: String,
-    joiningDate: Date, // Assuming joiningDate is a date
+    joiningDate: Date,
     position: String,
     salary: Number,
     switchReason: String,
   },
   presentPosition: {
     designation: String,
-    dateOfJoining: Date, // Assuming dateOfJoining is a date
-    branchName: String,
-    samityName: String,
+    dateOfJoining: Date,
     salaryAmount: Number,
     mobileBill: Number,
     taDa: Number,
