@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const expenseSchema = new mongoose.Schema(
+
+const purchaseSchema = new mongoose.Schema(
   {
     branchId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -11,28 +12,37 @@ const expenseSchema = new mongoose.Schema(
       ref: "Samity",
       required: true,
     },
+    expenseName: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    unitAmount: {
+      type: Number,
+    },
+    unitPrice: {
+      type: Number,
+    },
+    tds: {
+      type: Number,
+    },
+    tax: {
+      type: Number,
+    },
     date: {
       type: Date,
       required: true,
     },
-    officeRent: {
+    vat: {
       type: Number,
-      required: true,
     },
-    salary: {
+    totalPayment: {
       type: Number,
-      required: true,
     },
-    stationaryAndPrinting: {
-      type: Number,
-      required: true,
-    },
-    taDaAllowances: {
-      type: Number,
-      required: true,
-    },
-    anyBill: {
-      type: Number,
+    status: {
+      type: String,
+      enum: ["paid", "unpaid"],
       required: true,
     },
     remarks: {
@@ -42,6 +52,6 @@ const expenseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Expense =
-  mongoose.models.Expense || mongoose.model("Expense", expenseSchema);
-module.exports = Expense;
+const Purchase =
+  mongoose.models.Purchase || mongoose.model("Purchase", purchaseSchema);
+module.exports = Purchase;
