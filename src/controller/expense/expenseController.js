@@ -5,7 +5,7 @@ const purchaseValidationSchema = require("../../schemaValidation/purchaseSchemaV
 const Purchase = require("../../model/purchaseSchema");
 const createMonthlyExpenseController = asyncHandler(async (req, res) => {
   const monthlyExpenseBody = req.body;
-  const { error, value } = expenseValidationSchema.validate(monthlyExpenseBody);
+  const { error } = expenseValidationSchema.validate(monthlyExpenseBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }

@@ -4,6 +4,14 @@ const samitySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  drawerCash: {
+    type: Number,
+    default: 0,
+  },
+  bankCash: {
+    type: Number,
+    default: 0,
+  },
   samityCode: {
     type: String,
     required: true,
