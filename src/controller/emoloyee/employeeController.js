@@ -3,6 +3,7 @@ const employeeSchemaValidation = require("../../schemaValidation/EmployeeValidat
 const Employee = require("../../model/EmployeeSchema");
 const bcrypt = require("bcrypt");
 const Attendance = require("../../model/EmployeeAttendanceSchema");
+const PrayingAmount = require("../../model/PrayingAmountSchema");
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
   console.log(employeeBody);
@@ -36,11 +37,26 @@ const createEmployeeController = asyncHandler(async (req, res) => {
 
 const searchEmployeeController = asyncHandler(async (req, res) => {
   const number = req.params.id;
-  const employee = await Employee.findOne({ mobileNumber: number });
+  const employee = await Employee.findOne({ mobileNumber: number }).lean();
+
   if (!employee) {
     return res.status(404).json({ message: "No employee found" });
   }
-  return res.json({ data: [employee] });
+  let adjustmentAmount = 0;
+  const providentFund = await PrayingAmount.findOne({
+    employeeId: employee._id,
+  });
+  if (providentFund) {
+    const { adjustmentAmount: amount } = providentFund;
+    adjustmentAmount = amount;
+  }
+
+  const data = {
+    ...employee,
+    advance: adjustmentAmount,
+  };
+
+  return res.json({ data: [data] });
 });
 
 const setEmployeeCredentialsCredentialsController = asyncHandler(

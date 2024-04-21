@@ -17,6 +17,9 @@ const expenseRoute = require("./routes/expenseRoute");
 const bankRoute = require("./routes/bankRoute");
 const drawerRoute = require("./routes/drawerRoute");
 const sitemap = require("express-sitemap-html");
+const prayingAmountRoute = require("./routes/prayingAmountRoute");
+const paySlipRoute = require("./routes/paySlipRoute");
+const assetRoute = require("./routes/assetRoute");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -35,8 +38,10 @@ app.use("/employee", employeeRoute);
 app.use("/expense", expenseRoute);
 app.use("/bank", bankRoute);
 app.use("/drawer", drawerRoute);
+app.use("/praying-application", prayingAmountRoute);
+app.use("/pay-slip", paySlipRoute);
+app.use("/asset", assetRoute);
 app.get("/api-docs", sitemap(app));
-
 app.all("*", (req, res) => {
   res.status(404);
   res.json({ message: "404 Not Found" });
