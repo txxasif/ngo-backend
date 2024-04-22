@@ -71,6 +71,9 @@ const getUserByPhoneNumberController = asyncHandler(async (req, res) => {
         nominee: 1,
         branchName: { $arrayElemAt: ["$branch.branchName", 0] },
         samityName: { $arrayElemAt: ["$samity.samityName", 0] },
+
+        branchId: { $arrayElemAt: ["$branch._id", 0] },
+        samityId: { $arrayElemAt: ["$samity._id", 0] },
       },
     },
   ]);
@@ -78,9 +81,11 @@ const getUserByPhoneNumberController = asyncHandler(async (req, res) => {
 });
 // * get users by branch and samity id
 const getUsersByBranchAndSamityId = asyncHandler(async (req, res) => {
-  const branchId = req.query.branch;
-  const samityId = req.query.samity;
+  const branchId = req.query.branchId;
+  const samityId = req.query.samityId;
   const users = await LocalUser.find({ branchId, samityId });
+  console.log(branchId, samityId);
+  console.log(users);
   res.send({ data: users });
 });
 module.exports = {

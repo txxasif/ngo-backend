@@ -30,6 +30,8 @@ const assetSchema = new mongoose.Schema(
     total: {
       type: Number,
     },
+
+    depreciation: { type: Number, default: 0 },
     description: {
       type: String,
       required: true,

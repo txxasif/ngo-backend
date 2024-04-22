@@ -156,6 +156,14 @@ const getEmployeeAttendanceCountController = asyncHandler(async (req, res) => {
   });
   res.json({ attendanceRecords: attendanceRecords.length });
 });
+// * get users by branch and samity id
+const getEmployeeByBranchAndSamityId = asyncHandler(async (req, res) => {
+  const branchId = req.query.branchId;
+  const samityId = req.query.samityId;
+  const users = await Employee.find({ branchId, samityId });
+
+  res.json({ data: users });
+});
 module.exports = {
   createEmployeeController,
   searchEmployeeController,
@@ -163,4 +171,5 @@ module.exports = {
   getAllEmployeesAttendanceController,
   setEmployeesAttendanceController,
   getEmployeeAttendanceCountController,
+  getEmployeeByBranchAndSamityId,
 };

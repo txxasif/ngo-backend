@@ -35,6 +35,16 @@ const loanAccountSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
+    samityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Samity",
+      required: true,
+    },
     profitPercentage: {
       type: Number,
       required: true,

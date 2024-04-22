@@ -17,6 +17,10 @@ const assetValidationSchema = Joi.object({
     "any.required": "Product name is required.",
     "string.empty": "Product name cannot be empty.",
   }),
+  depreciation: Joi.number().required().messages({
+    "any.required": "Depreciation is required.",
+    "number.base": "Depreciation must be a number.",
+  }),
   quantity: Joi.number().required().messages({
     "any.required": "Quantity is required.",
     "number.base": "Quantity must be a number.",

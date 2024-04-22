@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const loanAccountValidationSchema = require("../../schemaValidation/loanAccountValidationSchema");
 const { LoanAccount } = require("../../model/LoanAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
+const mongoose = require("mongoose");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -42,7 +43,77 @@ const searchLoanAccountController = asyncHandler(async (req, res) => {
   return res.status(200).json({ data: [finalResponse] });
 });
 
+const payLoanAccountController = asyncHandler(async (req, res) => {
+  const body = req.body;
+  const isLoanAccount = await LoanAccount.findOne({ memberId: body.memberId });
+  const { amount } = body;
+  isLoanAccount.paid += amount;
+  await isLoanAccount.save();
+  console.log(body);
+  res.json({ message: "done" });
+});
+
+const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
+  try {
+    const { branchId, samityId, paymentTerm } = req.query;
+
+    const loanAccounts = await LoanAccount.aggregate([
+      // Match documents based on provided parameters
+      {
+        $match: {
+          branchId: new mongoose.Types.ObjectId(branchId),
+          samityId: new mongoose.Types.ObjectId(samityId),
+          paymentTerm,
+        },
+      },
+      // Perform lookup to fetch related data from other collections
+      {
+        $lookup: {
+          from: "samities",
+          localField: "samityId",
+          foreignField: "_id",
+          as: "samity",
+        },
+      },
+      {
+        $lookup: {
+          from: "branches",
+          localField: "branchId",
+          foreignField: "_id",
+          as: "branch",
+        },
+      },
+      {
+        $lookup: {
+          from: "localusers",
+          localField: "memberId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      // Project the required fields
+      {
+        $project: {
+          SamityName: { $arrayElemAt: ["$samity.samityName", 0] },
+          BranchName: { $arrayElemAt: ["$branch.branchName", 0] },
+          UserName: { $arrayElemAt: ["$user.name", 0] },
+          paymentTerm: 1,
+          loanAmount: 1,
+          paid: 1,
+        },
+      },
+    ]);
+    console.log(loanAccounts);
+    res.json(loanAccounts);
+  } catch (error) {
+    console.error("Error fetching loan accounts:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
+  getLoanAccountsByBranchAndSamityId,
+  payLoanAccountController,
 };

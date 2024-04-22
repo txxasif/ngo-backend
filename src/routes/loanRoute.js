@@ -2,12 +2,14 @@ const express = require("express");
 const {
   createNewLoanAccountController,
   searchLoanAccountController,
+  payLoanAccountController,
+  getLoanAccountsByBranchAndSamityId,
 } = require("../controller/loan/loanController");
 const loanRoute = express.Router();
 
 loanRoute.post("/create", createNewLoanAccountController);
-// loanRoute.post("/makeDeposit", makeDepositController);
-// loanRoute.post("/makeWithdraw", withdrawController);
+loanRoute.get("/all", getLoanAccountsByBranchAndSamityId);
 loanRoute.get("/search/:id", searchLoanAccountController);
+loanRoute.post("/pay", payLoanAccountController);
 
 module.exports = loanRoute;

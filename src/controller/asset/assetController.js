@@ -3,6 +3,7 @@ const assetValidationSchema = require("../../schemaValidation/assetSchemaValidat
 const Asset = require("../../model/AssetSchema");
 const addAssetController = asyncHandler(async (req, res) => {
   const assetBody = req.body;
+  console.log(assetBody);
   const { error } = assetValidationSchema.validate(assetBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });

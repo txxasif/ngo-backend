@@ -23,6 +23,13 @@ const loanAccountValidationSchema = Joi.object({
     "any.required": "Loan amount is required.",
     "number.base": "Loan amount must be a number.",
   }),
+
+  branchId: Joi.string().required().messages({
+    "any.required": "Branch ID is required",
+  }),
+  samityId: Joi.string().required().messages({
+    "any.required": "Samity ID is required",
+  }),
   profitPercentage: Joi.number().required().messages({
     "any.required": "Profit percentage is required.",
     "number.base": "Profit percentage must be a number.",
