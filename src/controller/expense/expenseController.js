@@ -25,8 +25,21 @@ const createPurchaseExpenseController = asyncHandler(async (req, res) => {
   await newPurchases.save();
   return res.send({ message: "Done" });
 });
+const getExpenseList = asyncHandler(async (req, res) => {
+  const { branchId, samityId, type } = req.query;
+  let data = [];
+  if (type === "monthly") {
+    const monthly = await Expense.find({ branchId, samityId }).lean();
+    data = monthly;
+  } else {
+    const purchase = await Purchase.find({ branchId, samityId }).lean();
+    data = purchase;
+  }
+  return res.json({ data });
+});
 
 module.exports = {
   createMonthlyExpenseController,
   createPurchaseExpenseController,
+  getExpenseList,
 };

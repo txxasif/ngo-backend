@@ -13,6 +13,12 @@ const addAssetController = asyncHandler(async (req, res) => {
   res.json({ message: "Done" });
 });
 
+const getAllAssetsController = asyncHandler(async (req, res) => {
+  const { branchId, samityId } = req.query;
+  const asset = await Asset.find({ branchId, samityId });
+  return res.json({ data: asset });
+});
 module.exports = {
   addAssetController,
+  getAllAssetsController,
 };
