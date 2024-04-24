@@ -11,11 +11,20 @@ const addLocalUserController = asyncHandler(async (req, res) => {
   }
 
   const checkPhoneNumber = await LocalUser.findOne({
-    phoneNumber: localUserBody.phoneNumber,
+    mobileNumber: localUserBody.mobileNumber,
   });
+
   if (checkPhoneNumber) {
     return res.status(400).json({ message: "Phone number is already in use." });
   }
+  const checkNid = await LocalUser.findOne({
+    nidNumber: localUserBody.nidNumber,
+  });
+
+  if (checkNid) {
+    return res.status(400).json({ message: "NID number is already in use." });
+  }
+
   const newLocalUser = new LocalUser(localUserBody);
   await newLocalUser.save();
   return res.json({ message: "User Create Successfully" }).status(200);

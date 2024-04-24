@@ -6,8 +6,11 @@ const bankCashValidationSchema = require("../../schemaValidation/bankCashSchemaV
 
 const addBankController = asyncHandler(async (req, res) => {
   const body = req.body;
+  const existingUser = await User.findOne({
+    name: { $regex: new RegExp("^" + name + "$", "i") },
+  });
   if (req.body === undefined || req.body === "") {
-    return res.status(404).json({ message: "Please Enter Bank Number" });
+    return res.status(404).json({ message: "Please Enter Bank Name" });
   }
   const newBank = new Bank(body);
   console.log(body);
