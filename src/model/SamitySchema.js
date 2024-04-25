@@ -1,3 +1,4 @@
+const { number } = require("joi");
 const mongoose = require("mongoose");
 const samitySchema = new mongoose.Schema({
   samityName: {
@@ -9,6 +10,14 @@ const samitySchema = new mongoose.Schema({
     default: 0,
   },
   bankCash: {
+    type: Number,
+    default: 0,
+  },
+  loanInField: {
+    type: Number,
+    default: 0,
+  },
+  loanProfit: {
     type: Number,
     default: 0,
   },

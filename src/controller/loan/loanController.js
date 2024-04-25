@@ -3,6 +3,7 @@ const loanAccountValidationSchema = require("../../schemaValidation/loanAccountV
 const { LoanAccount } = require("../../model/LoanAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
+const Samity = require("../../model/SamitySchema");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -18,6 +19,9 @@ const createNewLoanAccountController = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Loan account already exists" });
   }
   const newLoanAccount = await LoanAccount.create(loanBody);
+  const samity = await Samity.findOne({ _id: loanBody.samityId });
+  samity.loanInField += Number(loanBody.loanAmount);
+  await samity.save();
   if (!newLoanAccount) {
     return res.status(404).json({ message: "Something Went Wrong" });
   }
@@ -27,7 +31,7 @@ const createNewLoanAccountController = asyncHandler(async (req, res) => {
 const searchLoanAccountController = asyncHandler(async (req, res) => {
   const phone = req.params.id;
   const user = await LocalUser.findOne({ mobileNumber: phone })
-    .select("_id name")
+    .select("_id name samityId")
     .lean();
   if (!user) {
     return res.status(404).json({ message: "No user data available" });
@@ -47,6 +51,7 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
   const isLoanAccount = await LoanAccount.findOne({ memberId: body.memberId });
   const { amount } = body;
+
   isLoanAccount.paid += amount;
   await isLoanAccount.save();
   console.log(body);
@@ -110,10 +115,38 @@ const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+const countLoanProfitController = asyncHandler(async (req, res) => {
+  const { branchId, samityId } = req.query;
+  console.log(branchId, samityId);
+  const loanAccounts = await LoanAccount.find({
+    branchId: new mongoose.Types.ObjectId(branchId),
+    samityId: new mongoose.Types.ObjectId(samityId),
+  }).lean();
+  const totalProfit = loanAccounts.reduce((total, account) => {
+    console.log(account);
+    if (account.paid > account.loanAmount) {
+      return total + (Number(account.paid) - Number(account.loanAmount));
+    }
+  }, 0);
 
+  const localUsers = await LocalUser.find({
+    branchId: new mongoose.Types.ObjectId(branchId),
+    samityId: new mongoose.Types.ObjectId(samityId),
+  }).lean();
+  const membershipFee = localUsers.reduce((acc, user) => {
+    return acc + user.membershipFee;
+  }, 0);
+  const data = {
+    totalProfit: totalProfit ? totalProfit : 0,
+    membershipFee: membershipFee ? membershipFee : 0,
+  };
+  console.log(data);
+  res.json({ data });
+});
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
   getLoanAccountsByBranchAndSamityId,
   payLoanAccountController,
+  countLoanProfitController,
 };
