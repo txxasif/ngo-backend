@@ -6,14 +6,18 @@ const bankCashValidationSchema = require("../../schemaValidation/bankCashSchemaV
 
 const addBankController = asyncHandler(async (req, res) => {
   const body = req.body;
-  const existingUser = await User.findOne({
-    name: { $regex: new RegExp("^" + name + "$", "i") },
-  });
+  const { name } = body;
   if (req.body === undefined || req.body === "") {
     return res.status(404).json({ message: "Please Enter Bank Name" });
   }
+
+  const existingBankWithName = await Bank.findOne({
+    name: { $regex: new RegExp(`^${name}$`, "i") },
+  });
+  if (existingBankWithName) {
+    return res.status(400).json({ message: "Bank with name already exists" });
+  }
   const newBank = new Bank(body);
-  console.log(body);
   await newBank.save();
   return res.status(200).json({ message: "Bank Successful Created" });
 });
