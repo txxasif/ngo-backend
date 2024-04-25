@@ -97,8 +97,15 @@ const getUsersByBranchAndSamityId = asyncHandler(async (req, res) => {
   console.log(users);
   res.send({ data: users });
 });
+// get user by id
+const getUserByIdController = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const user = await LocalUser.findOne({ _id: id });
+  res.json({ data: user });
+});
 module.exports = {
   addLocalUserController,
   getUserByPhoneNumberController,
   getUsersByBranchAndSamityId,
+  getUserByIdController,
 };

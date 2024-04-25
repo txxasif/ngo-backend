@@ -61,6 +61,14 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
 const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
   try {
     const { branchId, samityId, paymentTerm } = req.query;
+    if (paymentTerm) {
+      console.log(null);
+    }
+    let params =
+      paymentTerm != "null"
+        ? { branchId, samityId, paymentTerm }
+        : { branchId, samityId };
+    console.log(params);
 
     const loanAccounts = await LoanAccount.aggregate([
       // Match documents based on provided parameters
@@ -68,7 +76,6 @@ const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
         $match: {
           branchId: new mongoose.Types.ObjectId(branchId),
           samityId: new mongoose.Types.ObjectId(samityId),
-          paymentTerm,
         },
       },
       // Perform lookup to fetch related data from other collections
@@ -102,6 +109,7 @@ const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
           SamityName: { $arrayElemAt: ["$samity.samityName", 0] },
           BranchName: { $arrayElemAt: ["$branch.branchName", 0] },
           UserName: { $arrayElemAt: ["$user.name", 0] },
+          photo: { $arrayElemAt: ["$user.photo", 0] },
           paymentTerm: 1,
           loanAmount: 1,
           paid: 1,
