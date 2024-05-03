@@ -1,16 +1,21 @@
 const asyncHandler = require("express-async-handler");
-
 const bcrypt = require("bcrypt");
-const User = require("../model/User.Schema");
+const Admin = require("../model/AdminSchema");
 
-const createNewUser = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
+const createNewAdminController = asyncHandler(async (req, res) => {
+  const { phoneNumber, password, name } = req.body;
+  if (!phoneNumber || !password || !name) {
     return res.status(404).json({ message: "All Fields are required" });
   }
+  const isAdminExist = await Admin.findOne({ phoneNumber: phoneNumber });
+  if (isAdminExist) {
+    return res
+      .status(400)
+      .json({ message: " A user with the same Phone Number  already exists" });
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = { username: username, password: hashedPassword };
-  const newUser2 = await User.create(newUser);
+  const newUser = { phoneNumber, name, password: hashedPassword };
+  const newUser2 = await Admin.create(newUser);
 
   if (newUser2) {
     return res.status(200).json({ message: "user created" });
@@ -18,5 +23,5 @@ const createNewUser = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  createNewUser,
+  createNewAdminController,
 };

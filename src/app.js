@@ -5,7 +5,6 @@ const path = require("path");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const morgan = require("morgan");
-const userRoute = require("./routes/userRoute");
 const userAuthRoute = require("./routes/authRoute");
 const branchRoute = require("./routes/branchRoute");
 const samityRoute = require("./routes/samityRoute");
@@ -20,13 +19,14 @@ const sitemap = require("express-sitemap-html");
 const prayingAmountRoute = require("./routes/prayingAmountRoute");
 const paySlipRoute = require("./routes/paySlipRoute");
 const assetRoute = require("./routes/assetRoute");
+const adminRoute = require("./routes/adminRoute");
 
 app.use(cors());
 app.use(morgan("combined"));
 app.use("/", express.static(path.join(__dirname, "/public")));
 app.use(express.json());
 
-app.use("/user", userRoute);
+app.use("/admin", adminRoute);
 app.use("/auth", userAuthRoute);
 
 app.use("/branch", branchRoute);
