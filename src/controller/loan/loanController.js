@@ -4,6 +4,7 @@ const { LoanAccount } = require("../../model/LoanAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
 const Samity = require("../../model/SamitySchema");
+const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaValidation");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -151,10 +152,18 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
   console.log(data);
   res.json({ data });
 });
+const ngoLoanCreateController = asyncHandler(async (req, res) => {
+  const loanBody = req.body;
+  const { error } = ngoLoanSchemaValidation.validate(loanBody);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+});
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
   getLoanAccountsByBranchAndSamityId,
   payLoanAccountController,
   countLoanProfitController,
+  ngoLoanCreateController,
 };
