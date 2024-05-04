@@ -5,6 +5,7 @@ const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
 const Samity = require("../../model/SamitySchema");
 const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaValidation");
+const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -154,11 +155,35 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
 });
 const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
+  console.log(loanBody);
   const { error } = ngoLoanSchemaValidation.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  const newLoanAccount = new NgoLoan(loanBody);
+  await newLoanAccount.save();
+  return res.json({ message: " done" });
 });
+const ngoLoanPayController = asyncHandler(async (req, res) => {
+  const body = req.body;
+  const { ngoLoanId, amount, date } = body;
+  if (!ngoLoanId || !amount || !date) {
+    return res.status(404).json({ message: "All fields are required" });
+  }
+  const ngoLoanAccount = await NgoLoan.findOne({ _id: ngoLoanId });
+  ngoLoanAccount.totalPaid += amount;
+  await ngoLoanAccount.save();
+  const newTransaction = new NgoLoanTransaction(body);
+  await newTransaction.save();
+  return res.json({ message: "Payment Done" });
+});
+const ngoLoanPaymentDetailsByLoanIdController = asyncHandler(
+  async (req, res) => {
+    const id = req.params.id;
+    const data = await NgoLoanTransaction.find({ ngoLoanId: id }).lean();
+    return res.json({ data });
+  }
+);
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
@@ -166,4 +191,6 @@ module.exports = {
   payLoanAccountController,
   countLoanProfitController,
   ngoLoanCreateController,
+  ngoLoanPaymentDetailsByLoanIdController,
+  ngoLoanPayController,
 };
