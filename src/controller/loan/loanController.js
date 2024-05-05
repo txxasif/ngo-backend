@@ -165,9 +165,18 @@ const ngoLoanCreateController = asyncHandler(async (req, res) => {
   return res.json({ message: " done" });
 });
 const ngoLoanPayListController = asyncHandler(async (req, res) => {
-  const data = await NgoLoan.find({});
+  console.log("hi");
+  let data = [];
+  try {
+    const response = await NgoLoan.find({}).lean();
+    data = response;
+  } catch (err) {
+    data = [];
+  }
+
   return res.json({ data: data });
 });
+
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
   const { ngoLoanId, amount, date } = body;

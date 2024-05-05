@@ -13,10 +13,12 @@ const {
 const loanRoute = express.Router();
 
 loanRoute.post("/create", createNewLoanAccountController);
+
+loanRoute.get("/ngo-loan/list", ngoLoanPayListController);
 loanRoute.post("/ngo-loan/create", ngoLoanCreateController);
 loanRoute.post("/ngo-loan/pay", ngoLoanPayController);
-loanRoute.get("/ngo-loan/all", ngoLoanPayListController);
 loanRoute.get("/ngo-loan/:id", ngoLoanPaymentDetailsByLoanIdController);
+
 loanRoute.get("/all", getLoanAccountsByBranchAndSamityId);
 loanRoute.get("/search/:id", searchLoanAccountController);
 loanRoute.post("/pay", payLoanAccountController);
