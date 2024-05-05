@@ -20,43 +20,48 @@ const ngoLoanTransactionSchema = new mongoose.Schema({
   },
 });
 
-const ngoLoanSchema = new mongoose.Schema({
-  institute: {
-    type: String,
-    required: true,
+const ngoLoanSchema = new mongoose.Schema(
+  {
+    institute: {
+      type: String,
+      required: true,
+    },
+    nameOfInstitute: {
+      type: String,
+      required: true,
+    },
+    durationInMonth: {
+      type: Number,
+      required: true,
+    },
+    interestRate: {
+      type: Number,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    perInstallment: {
+      type: Number,
+      required: true,
+    },
+    remark: {
+      type: String,
+    },
+    totalPaid: {
+      type: Number,
+      default: 0,
+    },
   },
-  nameOfInstitute: {
-    type: String,
-    required: true,
-  },
-  durationInMonth: {
-    type: Number,
-    required: true,
-  },
-  interestRate: {
-    type: Number,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-  totalAmount: {
-    type: Number,
-    required: true,
-  },
-  perInstallment: {
-    type: Number,
-    required: true,
-  },
-  remark: {
-    type: String,
-  },
-  totalPaid: {
-    type: Number,
-    default: 0,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 const NgoLoanTransaction =
   mongoose.models.NgoLoanTransaction ||
   mongoose.model("NgoLoanTransaction", ngoLoanTransactionSchema);
