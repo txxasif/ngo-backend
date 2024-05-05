@@ -195,45 +195,17 @@ const ngoLoanPaymentDetailsByLoanIdController = asyncHandler(
   async (req, res) => {
     const id = req.params.id;
 
-    const data = await NgoLoanTransaction.aggregate([
-      {
-        $match: { ngoLoanId: new mongoose.Types.ObjectId(id) },
-      },
-      {
-        $lookup: {
-          from: "ngoloans",
-          localField: "ngoLoanId",
-          foreignField: "_id",
-          as: "loan",
-        },
-      },
-      {
-        $unwind: "$loan",
-      },
-      {
-        $group: {
-          _id: "$ngoLoanId",
-          totalAmount: { $first: "$loan.totalAmount" },
-          totalPaid: { $first: "$loan.totalPaid" },
-          nameOfInstitute: { $first: "$loan.nameOfInstitute" },
-          perInstallment: { $first: "$loan.perInstallment" },
-          transactions: { $push: "$$ROOT" }, // Push all fields of matched documents to transactions array
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          NgoLoanDetails: {
-            totalAmount: "$totalAmount",
-            totalPaid: "$totalPaid",
-            nameOfInstitute: "$nameOfInstitute",
-            perInstallment: "$perInstallment",
-          },
-          transactions: 1,
-        },
-      },
-    ]);
+    const ngoLoanDetails = await NgoLoan.findOne({ _id: id })
+      .select("nameOfInstitute totalAmount perInstallment totalPaid")
+      .lean();
 
+    const transactionDetails = await NgoLoanTransaction.find({
+      ngoLoanId: id,
+    }).lean();
+    const data = {
+      transactionDetails: transactionDetails,
+      ngoLoanDetails,
+    };
     return res.json({ data });
   }
 );
