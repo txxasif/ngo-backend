@@ -179,6 +179,7 @@ const ngoLoanPayListController = asyncHandler(async (req, res) => {
 
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
+  console.log(body);
   const { ngoLoanId, amount, date } = body;
   if (!ngoLoanId || !amount || !date) {
     return res.status(404).json({ message: "All fields are required" });
@@ -193,10 +194,50 @@ const ngoLoanPayController = asyncHandler(async (req, res) => {
 const ngoLoanPaymentDetailsByLoanIdController = asyncHandler(
   async (req, res) => {
     const id = req.params.id;
-    const data = await NgoLoanTransaction.find({ ngoLoanId: id }).lean();
+
+    const data = await NgoLoanTransaction.aggregate([
+      {
+        $match: { ngoLoanId: new mongoose.Types.ObjectId(id) },
+      },
+      {
+        $lookup: {
+          from: "ngoloans",
+          localField: "ngoLoanId",
+          foreignField: "_id",
+          as: "loan",
+        },
+      },
+      {
+        $unwind: "$loan",
+      },
+      {
+        $group: {
+          _id: "$ngoLoanId",
+          totalAmount: { $first: "$loan.totalAmount" },
+          totalPaid: { $first: "$loan.totalPaid" },
+          nameOfInstitute: { $first: "$loan.nameOfInstitute" },
+          perInstallment: { $first: "$loan.perInstallment" },
+          transactions: { $push: "$$ROOT" }, // Push all fields of matched documents to transactions array
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          NgoLoanDetails: {
+            totalAmount: "$totalAmount",
+            totalPaid: "$totalPaid",
+            nameOfInstitute: "$nameOfInstitute",
+            perInstallment: "$perInstallment",
+          },
+          transactions: 1,
+        },
+      },
+    ]);
+
     return res.json({ data });
   }
 );
+
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
