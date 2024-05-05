@@ -164,6 +164,10 @@ const ngoLoanCreateController = asyncHandler(async (req, res) => {
   await newLoanAccount.save();
   return res.json({ message: " done" });
 });
+const ngoLoanPayListController = asyncHandler(async (req, res) => {
+  const data = await NgoLoan.find({});
+  return res.json({ data: data });
+});
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
   const { ngoLoanId, amount, date } = body;
@@ -193,4 +197,5 @@ module.exports = {
   ngoLoanCreateController,
   ngoLoanPaymentDetailsByLoanIdController,
   ngoLoanPayController,
+  ngoLoanPayListController,
 };
