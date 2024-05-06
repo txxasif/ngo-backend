@@ -109,9 +109,21 @@ const withdrawController = asyncHandler(async (req, res) => {
     .status(200)
     .json({ message: "Withdrawal successful", depositAccount });
 });
+const depositAccountListByBrachAndSamityController = asyncHandler(
+  async (req, res) => {
+    const { branchId, samityId } = req.query;
+    const data = await DepositAccount.find({
+      branchId: branchId,
+      samityId: samityId,
+    }).lean();
+
+    return res.json({ data });
+  }
+);
 module.exports = {
   createDepositAccountController,
   makeDepositController,
   searchDepositAccountController,
   withdrawController,
+  depositAccountListByBrachAndSamityController,
 };

@@ -118,7 +118,7 @@ const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
         },
       },
     ]);
-    console.log(loanAccounts);
+
     res.json(loanAccounts);
   } catch (error) {
     console.error("Error fetching loan accounts:", error);
