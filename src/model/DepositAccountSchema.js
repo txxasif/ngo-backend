@@ -41,6 +41,17 @@ const depositAccountSchema = new mongoose.Schema(
       ref: "LocalUser",
       required: true,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
+    samityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Samity",
+      required: true,
+    },
+
     paymentTerm: {
       type: String,
       enum: [

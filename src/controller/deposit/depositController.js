@@ -116,6 +116,7 @@ const depositAccountListByBrachAndSamityController = asyncHandler(
       branchId: branchId,
       samityId: samityId,
     }).lean();
+    console.log(data);
 
     return res.json({ data });
   }
