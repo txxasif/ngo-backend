@@ -132,13 +132,13 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
     branchId: new mongoose.Types.ObjectId(branchId),
     samityId: new mongoose.Types.ObjectId(samityId),
   }).lean();
-  const totalProfit = loanAccounts.reduce((total, account) => {
-    console.log(account);
-    if (account.paid > account.loanAmount) {
-      return total + (Number(account.paid) - Number(account.loanAmount));
+  console.log(loanAccounts.length);
+  let totalProfit = 0;
+  for (let i = 0; i < loanAccounts.length; i++) {
+    if (loanAccounts[i].paid > loanAccounts[i].loanAmount) {
+      totalProfit += loanAccounts[i].paid - loanAccounts[i].loanAmount;
     }
-  }, 0);
-
+  }
   const localUsers = await LocalUser.find({
     branchId: new mongoose.Types.ObjectId(branchId),
     samityId: new mongoose.Types.ObjectId(samityId),
@@ -150,8 +150,8 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
     totalProfit: totalProfit ? totalProfit : 0,
     membershipFee: membershipFee ? membershipFee : 0,
   };
-  console.log(data);
-  res.json({ data, loanAccounts });
+  console.log(totalProfit, "hi");
+  res.json({ data });
 });
 const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
