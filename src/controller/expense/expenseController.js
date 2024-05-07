@@ -9,6 +9,15 @@ const createMonthlyExpenseController = asyncHandler(async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  const { officeRent, salary, stationaryAndPrinting, taDaAllowances, anyBill } =
+    monthlyExpenseBody;
+  const total =
+    Number(officeRent) +
+    Number(salary) +
+    Number(stationaryAndPrinting) +
+    Number(anyBill) +
+    Number(taDaAllowances);
+  monthlyExpenseBody["total"] = total;
   const newExpense = new Expense(monthlyExpenseBody);
   await newExpense.save();
   return res.send({ message: "done" });
@@ -16,11 +25,12 @@ const createMonthlyExpenseController = asyncHandler(async (req, res) => {
 
 const createPurchaseExpenseController = asyncHandler(async (req, res) => {
   const purchaseBody = req.body;
-  console.log(purchaseBody);
+
   const { error, value } = purchaseValidationSchema.validate(purchaseBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+
   const newPurchases = new Purchase(purchaseBody);
   await newPurchases.save();
   return res.send({ message: "Done" });

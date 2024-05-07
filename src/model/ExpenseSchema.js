@@ -35,6 +35,10 @@ const expenseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    total: {
+      type: Number,
+      default: 0,
+    },
     remarks: {
       type: String,
     },

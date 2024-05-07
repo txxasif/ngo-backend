@@ -40,6 +40,10 @@ const purchaseSchema = new mongoose.Schema(
     totalPayment: {
       type: Number,
     },
+    total: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid"],
