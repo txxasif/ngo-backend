@@ -151,7 +151,7 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
     membershipFee: membershipFee ? membershipFee : 0,
   };
   console.log(data);
-  res.json({ data, localUsers });
+  res.json({ data, loanAccounts });
 });
 const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
