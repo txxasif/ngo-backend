@@ -1,4 +1,3 @@
-const { number } = require("joi");
 const mongoose = require("mongoose");
 const samitySchema = new mongoose.Schema({
   samityName: {

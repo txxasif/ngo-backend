@@ -8,7 +8,7 @@ const addDrawerCashInOutController = asyncHandler(async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-
+  console.log(drawerCashBody);
   const { samityId, amount, type } = drawerCashBody;
   const selectedSamity = await Samity.findOne({ _id: samityId });
   if (type === "cashIn") {

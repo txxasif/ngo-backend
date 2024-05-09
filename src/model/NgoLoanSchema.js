@@ -25,6 +25,7 @@ const ngoLoanSchema = new mongoose.Schema(
     institute: {
       type: String,
       required: true,
+      enum: ["organization", "bank", "another"],
     },
     nameOfInstitute: {
       type: String,

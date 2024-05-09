@@ -33,6 +33,20 @@ const addBankTransactionController = asyncHandler(async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  const { type, branchId, samityId, amount } = bankCashBody;
+
+  const selectedSamity = await Samity.findOne({
+    _id: samityId,
+    branchId: branchId,
+  });
+  if (type === "cashIn") {
+    selectedSamity.drawerCash -= Number(amount);
+    selectedSamity.bankCash += Number(amount);
+  } else {
+    selectedSamity.drawerCash += Number(amount);
+    selectedSamity.bankCash -= Number(amount);
+  }
+
   const newBankCash = new BankCash(bankCashBody);
   await newBankCash.save();
   return res.json({ message: "done" });
