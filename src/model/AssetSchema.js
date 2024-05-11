@@ -22,6 +22,17 @@ const assetSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
+      default: 0,
+    },
+    unitPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    depreciationPrice: {
+      type: Number,
+      required: true,
+      default: 0,
     },
     amount: {
       type: Number,

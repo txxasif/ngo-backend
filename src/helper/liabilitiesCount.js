@@ -1,3 +1,4 @@
+const Asset = require("../model/AssetSchema");
 const { DepositAccount } = require("../model/DepositAccountSchema");
 const Employee = require("../model/EmployeeSchema");
 const Expense = require("../model/ExpenseSchema");
@@ -24,16 +25,33 @@ async function countProfit() {
   return totalProfit + membershipFee;
 }
 async function countExpenses() {
-  const expense = await Expense.find({}).lean();
-  const purchase = await Purchase.find({}).lean();
+  const result = await Expense.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: "$total" },
+      },
+    },
+  ]);
+  const result1 = await Purchase.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: "$totalPayment" },
+      },
+    },
+  ]);
   let totalExpenses = 0;
   let totalPurchases = 0;
-  for (let i = 0; i < purchase.length; i++) {
-    totalExpenses += purchase[i].totalPayment;
+  if (result.length > 0) {
+    totalExpenses = result[0].total;
   }
-  for (let j = 0; j < expense.length; j++) {
-    totalPurchases += expense[j].total;
+  if (result1.length > 0) {
+    totalPurchases = result1[0].total;
   }
+
+  console.log(totalExpenses, totalPurchases);
+  //console.log(totalPurchases, totalExpenses);
   return totalExpenses + totalPurchases;
 }
 async function countBankAndDrawerCash() {
@@ -125,6 +143,41 @@ async function employeeSecurityFundSum() {
   }
   return employeeFund;
 }
+async function countDepreciationPrice() {
+  const result = await Asset.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: "$depreciationPrice" },
+      },
+    },
+  ]);
+  let depreciationPrice = 0;
+  console.log(depreciationPrice);
+  if (result.length > 0) {
+    depreciationPrice = result[0].total;
+  }
+  return depreciationPrice;
+}
+async function countLoanLossProvision() {
+  const result = await LoanAccount.aggregate([
+    {
+      $group: {
+        _id: null,
+        given: { $sum: "$loanAmount" },
+        received: { $sum: "$paid" },
+      },
+    },
+  ]);
+  let loanGiven = 0;
+  let loanReceived = 0;
+  if (result.length > 0) {
+    loanGiven = result[0].given;
+    loanReceived = result[0].received;
+  }
+  return { loanGiven, loanReceived };
+}
+
 async function countAllLiability() {
   let profit = await countProfit();
   let expense = await countExpenses();
@@ -133,6 +186,8 @@ async function countAllLiability() {
   let totalDeposit = await totalDepositMoney();
   let employeeSecurityFund = await employeeSecurityFundSum();
   let financialBank = await sumBankAmount();
+  let depreciationPrice = await countDepreciationPrice();
+  let loanLossProvision = await countLoanLossProvision();
   return {
     profit,
     expense,
@@ -141,6 +196,8 @@ async function countAllLiability() {
     totalDeposit,
     employeeSecurityFund,
     financialBank,
+    depreciationPrice,
+    loanLossProvision,
   };
 }
 

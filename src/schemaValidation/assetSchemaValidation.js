@@ -25,6 +25,14 @@ const assetValidationSchema = Joi.object({
     "any.required": "Quantity is required.",
     "number.base": "Quantity must be a number.",
   }),
+  unitPrice: Joi.number().required().messages({
+    "any.required": "Unit Price is required.",
+    "number.base": "Unit Price must be a number.",
+  }),
+  depreciationPrice: Joi.number().required().messages({
+    "any.required": "Depreciation  Price is required.",
+    "number.base": "Depreciation Price must be a number.",
+  }),
   amount: Joi.number().required().messages({
     "any.required": "Amount is required.",
     "number.base": "Amount must be a number.",
