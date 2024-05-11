@@ -85,6 +85,31 @@ async function totalDepositMoney() {
   }
   return totalDeposit;
 }
+async function sumBankAmount() {
+  try {
+    const result = await NgoLoan.aggregate([
+      {
+        $match: {
+          institute: "bank",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalBankAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    if (result.length > 0) {
+      return result[0].totalBankAmount;
+    } else {
+      return 0; // Return 0 if no bank loans found
+    }
+  } catch (error) {
+    console.error("Error occurred while summing bank amounts:", error);
+    throw error; // Propagate error to the caller
+  }
+}
 async function employeeSecurityFundSum() {
   const result = await Employee.aggregate([
     {
@@ -107,7 +132,7 @@ async function countAllLiability() {
   let ngoLoanReceived = await ngoLoanReceivedMoney();
   let totalDeposit = await totalDepositMoney();
   let employeeSecurityFund = await employeeSecurityFundSum();
-
+  let financialBank = await sumBankAmount();
   return {
     profit,
     expense,
@@ -115,6 +140,7 @@ async function countAllLiability() {
     ngoLoanReceived,
     totalDeposit,
     employeeSecurityFund,
+    financialBank,
   };
 }
 
