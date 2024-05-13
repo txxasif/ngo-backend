@@ -73,7 +73,14 @@ const loanAccountSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-
+    isClosed: {
+      type: Boolean,
+      default: false,
+    },
+    closingRequest: {
+      type: Boolean,
+      default: false,
+    },
     transactions: [transactionSchema],
     paid: {
       type: Number,

@@ -16,10 +16,10 @@ const createNewLoanAccountController = asyncHandler(async (req, res) => {
   }
 
   const { memberId } = loanBody;
-  const isAlreadyExist = await LoanAccount.findOne({ memberId: memberId });
-  if (isAlreadyExist) {
-    return res.status(404).json({ message: "Loan account already exists" });
-  }
+  // const isAlreadyExist = await LoanAccount.findOne({ memberId: memberId });
+  // if (isAlreadyExist) {
+  //   return res.status(404).json({ message: "Loan account already exists" });
+  // }
   const newLoanAccount = await LoanAccount.create(loanBody);
   const samity = await Samity.findOne({ _id: loanBody.samityId });
   samity.loanInField += Number(loanBody.loanAmount);
@@ -32,22 +32,83 @@ const createNewLoanAccountController = asyncHandler(async (req, res) => {
 // * search loan account
 const searchLoanAccountController = asyncHandler(async (req, res) => {
   const phone = req.params.id;
-  const user = await LocalUser.findOne({ mobileNumber: phone })
-    .select("_id name samityId")
-    .lean();
-  if (!user) {
+  const pipeline = [
+    {
+      $match: { mobileNumber: phone }, // Filter by mobile number
+    },
+    {
+      $lookup: {
+        from: "samities", // Local field to join on
+        localField: "samityId",
+        foreignField: "_id", // Foreign field to join on
+        as: "samityDetails", // Alias for joined data
+      },
+    },
+    {
+      $lookup: {
+        from: "branches",
+        localField: "branchId",
+        foreignField: "_id",
+        as: "branchDetails",
+      },
+    },
+    {
+      $unwind: "$samityDetails", // Unwind single document array from lookup
+    },
+    {
+      $unwind: "$branchDetails", // Unwind single document array from lookup
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        photo: 1,
+        samityName: "$samityDetails.samityName", // Access nested data
+        branchName: "$branchDetails.branchName", // Access nested data
+      },
+    },
+  ];
+  const user = await LocalUser.aggregate(pipeline);
+  console.log(user);
+  if (!user.length) {
+    console.log("erro");
     return res.status(404).json({ message: "No user data available" });
   }
-  const isLoanAccount = await LoanAccount.findOne({
-    memberId: user._id,
-  }).lean();
+  const isLoanAccount = await LoanAccount.find({
+    memberId: user[0]._id,
+  })
+    .select(
+      "totalAmount numberOfInstallment paymentTerm openingDate expiryDate isClosed paid"
+    )
+    .lean();
   if (!isLoanAccount) {
     return res.status(404).json({ message: "No Loan Account Available" });
   }
   delete isLoanAccount._id;
-  const finalResponse = { ...user, ...isLoanAccount };
+  const finalResponse = { userDetails: user[0], loanAccounts: isLoanAccount };
+  console.log(finalResponse);
   return res.status(200).json({ data: [finalResponse] });
 });
+
+// // * search loan account
+// const searchLoanAccountController = asyncHandler(async (req, res) => {
+//   const phone = req.params.id;
+//   const user = await LocalUser.findOne({ mobileNumber: phone })
+//     .select("_id name samityId")
+//     .lean();
+//   if (!user) {
+//     return res.status(404).json({ message: "No user data available" });
+//   }
+//   const isLoanAccount = await LoanAccount.findOne({
+//     memberId: user._id,
+//   }).lean();
+//   if (!isLoanAccount) {
+//     return res.status(404).json({ message: "No Loan Account Available" });
+//   }
+//   delete isLoanAccount._id;
+//   const finalResponse = { ...user, ...isLoanAccount };
+//   return res.status(200).json({ data: [finalResponse] });
+// });
 
 const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
