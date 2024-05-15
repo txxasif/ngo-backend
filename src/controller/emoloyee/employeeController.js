@@ -38,7 +38,9 @@ const createEmployeeController = asyncHandler(async (req, res) => {
 
 const searchEmployeeController = asyncHandler(async (req, res) => {
   const number = req.params.id;
-  const employee = await Employee.findOne({ mobileNumber: number }).lean();
+  const employee = await Employee.findOne({ mobileNumber: number })
+    .select("-password")
+    .lean();
 
   if (!employee) {
     return res.status(404).json({ message: "No employee found" });

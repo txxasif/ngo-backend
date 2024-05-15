@@ -1,9 +1,22 @@
 const asyncHandler = require("express-async-handler");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
 const PaySlip = require("../../model/PaySlipSchema");
+const countOfficeDays = require("../../helper/countOfficeDays");
 
 const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
   const body = req.body;
+  console.log(body);
+  const { date, branchId, samityId, employeeId } = body;
+  delete body.date;
+  delete body.branchId;
+  delete body.samityId;
+  const countTotalOfficeDays = await countOfficeDays(
+    branchId,
+    samityId,
+    date,
+    employeeId
+  );
+  console.log(countTotalOfficeDays);
   const isEmployeeAppliedForPrayingAmount = await PrayingAmount.findOne({
     employeeId: body.employeeId,
   });

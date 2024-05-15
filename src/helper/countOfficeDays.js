@@ -1,7 +1,7 @@
 const moment = require("moment");
 const Attendance = require("../model/EmployeeAttendanceSchema");
 
-async function countOfficeDays(branchId, samityId, date) {
+async function countOfficeDays(branchId, samityId, date, employeeId) {
   const currentDate = new Date(date);
   const previousMonthDate = new Date(currentDate);
 
@@ -28,7 +28,7 @@ async function countOfficeDays(branchId, samityId, date) {
   );
 
   // Query the database to find attendance records within the previous month
-  const attendanceCount = await Attendance.countDocuments({
+  const officeAttendanceCount = await Attendance.countDocuments({
     samityId,
     branchId,
     date: {
@@ -37,8 +37,17 @@ async function countOfficeDays(branchId, samityId, date) {
     },
     presentEmployees: { $exists: true, $ne: [] }, // Check if presentEmployees array isn't empty
   });
+  const employeeAttendanceCount = await Attendance.countDocuments({
+    samityId,
+    branchId,
+    date: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+    presentEmployees: { $in: [employeeId] }, // Use $in operator to find documents where userId is in the presentEmployees array
+  });
 
-  return attendanceCount;
+  return { officeAttendanceCount, employeeAttendanceCount };
 }
 
 module.exports = countOfficeDays;
