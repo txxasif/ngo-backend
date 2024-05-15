@@ -99,10 +99,11 @@ const searchLoanAccountsTransactionsController = asyncHandler(
     const loanAccountDetails = await LoanAccount.findOne({ _id: id })
       .select("-periodOfTimeInMonths -closingRequest ")
       .lean();
-    const transactionDetails = await LoanTransaction.find({ loanId: id });
-    console.log(transactionDetails);
-    console.log(loanAccountDetails);
-    return res.json({ messages: "done" });
+    const transactionDetails = await LoanTransaction.find({ loanId: id }).sort({
+      createdAt: -1,
+    });
+
+    return res.json({ data: { transactionDetails, loanAccountDetails } });
   }
 );
 
