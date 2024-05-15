@@ -4,6 +4,7 @@ const Employee = require("../../model/EmployeeSchema");
 const bcrypt = require("bcrypt");
 const Attendance = require("../../model/EmployeeAttendanceSchema");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
+const countOfficeDays = require("../../helper/countOfficeDays");
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
   console.log(employeeBody);
@@ -77,9 +78,16 @@ const setEmployeeCredentialsCredentialsController = asyncHandler(
     return res.json({ message: "done" });
   }
 );
+
+// !attendance count controller
+const getAttendenceCountController = asyncHandler(async (req, res) => {
+  console.log("hit");
+  const { samityId, branchId, date } = req.query;
+  const count = await countOfficeDays(branchId, samityId, date);
+  res.json({ count: count });
+});
 const getAllEmployeesAttendanceController = asyncHandler(async (req, res) => {
   const { branchId, samityId, date } = req.query;
-  // Convert date string to Date object
   const startDate = new Date(date);
   startDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 for the start of the day
   const endDate = new Date(date);
@@ -133,7 +141,6 @@ const setEmployeesAttendanceController = asyncHandler(async (req, res) => {
         $lt: endDate, // Less than the end of the day
       },
     });
-    console.log(existingAttendance);
     existingAttendance.presentEmployees = presentEmployees;
     await existingAttendance.save();
     return res.json({ message: "Attendance saved successfully!" });
@@ -141,6 +148,7 @@ const setEmployeesAttendanceController = asyncHandler(async (req, res) => {
     res.status(404).json({ message: "Something went wrong" });
   }
 });
+
 const getEmployeeAttendanceCountController = asyncHandler(async (req, res) => {
   const { userId, year, month } = req.query;
   // Calculate the start and end dates of the specified month
@@ -172,4 +180,5 @@ module.exports = {
   setEmployeesAttendanceController,
   getEmployeeAttendanceCountController,
   getEmployeeByBranchAndSamityId,
+  getAttendenceCountController,
 };

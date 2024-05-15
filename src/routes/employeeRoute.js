@@ -7,6 +7,7 @@ const {
   setEmployeesAttendanceController,
   getEmployeeAttendanceCountController,
   getEmployeeByBranchAndSamityId,
+  getAttendenceCountController,
 } = require("../controller/emoloyee/employeeController");
 
 const employeeRoute = express.Router();
@@ -14,6 +15,7 @@ const employeeRoute = express.Router();
 employeeRoute.post("/create", createEmployeeController);
 employeeRoute.post("/credentials", setEmployeeCredentialsCredentialsController);
 employeeRoute.get("/search/:id", searchEmployeeController);
+employeeRoute.get("/test", getAttendenceCountController);
 // Attendance Section
 employeeRoute.get("/attendance", getAllEmployeesAttendanceController);
 employeeRoute.post("/set-attendance", setEmployeesAttendanceController);
