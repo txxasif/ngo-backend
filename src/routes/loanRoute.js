@@ -9,6 +9,7 @@ const {
   ngoLoanPayController,
   ngoLoanPaymentDetailsByLoanIdController,
   ngoLoanPayListController,
+  searchLoanAccountsTransactionsController,
 } = require("../controller/loan/loanController");
 const loanRoute = express.Router();
 
@@ -21,6 +22,10 @@ loanRoute.get("/ngo-loan/:id", ngoLoanPaymentDetailsByLoanIdController);
 
 loanRoute.get("/all", getLoanAccountsByBranchAndSamityId);
 loanRoute.get("/search/:id", searchLoanAccountController);
+loanRoute.get(
+  "/user-transaction/search/:id",
+  searchLoanAccountsTransactionsController
+);
 loanRoute.post("/pay", payLoanAccountController);
 loanRoute.get("/profit", countLoanProfitController);
 

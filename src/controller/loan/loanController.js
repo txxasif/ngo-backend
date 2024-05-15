@@ -1,6 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const loanAccountValidationSchema = require("../../schemaValidation/loanAccountValidationSchema");
-const { LoanAccount } = require("../../model/LoanAccountSchema");
+const {
+  LoanAccount,
+  LoanTransaction,
+} = require("../../model/LoanAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
 const Samity = require("../../model/SamitySchema");
@@ -89,35 +92,34 @@ const searchLoanAccountController = asyncHandler(async (req, res) => {
   console.log(finalResponse);
   return res.status(200).json({ data: [finalResponse] });
 });
-
-// // * search loan account
-// const searchLoanAccountController = asyncHandler(async (req, res) => {
-//   const phone = req.params.id;
-//   const user = await LocalUser.findOne({ mobileNumber: phone })
-//     .select("_id name samityId")
-//     .lean();
-//   if (!user) {
-//     return res.status(404).json({ message: "No user data available" });
-//   }
-//   const isLoanAccount = await LoanAccount.findOne({
-//     memberId: user._id,
-//   }).lean();
-//   if (!isLoanAccount) {
-//     return res.status(404).json({ message: "No Loan Account Available" });
-//   }
-//   delete isLoanAccount._id;
-//   const finalResponse = { ...user, ...isLoanAccount };
-//   return res.status(200).json({ data: [finalResponse] });
-// });
+// ?search transactions of loan accounts
+const searchLoanAccountsTransactionsController = asyncHandler(
+  async (req, res) => {
+    const id = req.params.id;
+    const loanAccountDetails = await LoanAccount.findOne({ _id: id })
+      .select("-periodOfTimeInMonths -closingRequest ")
+      .lean();
+    const transactionDetails = await LoanTransaction.find({ loanId: id });
+    console.log(transactionDetails);
+    console.log(loanAccountDetails);
+    return res.json({ messages: "done" });
+  }
+);
 
 const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
-  const isLoanAccount = await LoanAccount.findOne({ memberId: body.memberId });
-  const { amount } = body;
-
-  isLoanAccount.paid += amount;
-  await isLoanAccount.save();
-  console.log(body);
+  const { loanId, amount, addFineAmount, payFineAmount } = body;
+  const selectedLoanAccount = await LoanAccount.findOne({ _id: loanId });
+  if (addFineAmount > 0) {
+    selectedLoanAccount.loanFine += addFineAmount;
+  }
+  if (payFineAmount > 0) {
+    selectedLoanAccount.loanFinePaid += payFineAmount;
+  }
+  selectedLoanAccount.paid += amount;
+  await selectedLoanAccount.save();
+  const newLoanTransaction = await LoanTransaction(body);
+  await newLoanTransaction.save();
   res.json({ message: "done" });
 });
 
@@ -276,6 +278,7 @@ module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
   getLoanAccountsByBranchAndSamityId,
+  searchLoanAccountsTransactionsController,
   payLoanAccountController,
   countLoanProfitController,
   ngoLoanCreateController,

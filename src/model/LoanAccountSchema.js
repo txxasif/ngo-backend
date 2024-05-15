@@ -1,15 +1,33 @@
 const mongoose = require("mongoose");
 // Transaction Schema
-const transactionSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
+const transactionSchema = new mongoose.Schema(
+  {
+    loanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LoanAccount",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    addFineAmount: {
+      type: Number,
+      default: 0,
+    },
+    fineReason: {
+      type: String,
+      default: null,
+    },
+    payFineAmount: {
+      type: Number,
+      default: 0,
+    },
   },
-  amount: {
-    type: Number,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const loanAccountSchema = new mongoose.Schema(
   {
@@ -77,11 +95,18 @@ const loanAccountSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    loanFine: {
+      type: Number,
+      default: 0,
+    },
+    loanFinePaid: {
+      type: Number,
+      default: 0,
+    },
     closingRequest: {
       type: Boolean,
       default: false,
     },
-    transactions: [transactionSchema],
     paid: {
       type: Number,
       default: 0,
@@ -95,8 +120,8 @@ const loanAccountSchema = new mongoose.Schema(
 const LoanAccount =
   mongoose.models.LoanAccount ||
   mongoose.model("LoanAccount", loanAccountSchema);
-const Transaction =
-  mongoose.models.Transaction ||
-  mongoose.model("Transaction", transactionSchema);
+const LoanTransaction =
+  mongoose.models.LoanTransaction ||
+  mongoose.model("LoanTransaction", transactionSchema);
 
-module.exports = { LoanAccount, Transaction };
+module.exports = { LoanAccount, LoanTransaction };
