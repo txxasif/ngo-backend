@@ -175,29 +175,52 @@ async function countLoanLossProvision() {
     loanGiven = result[0].given;
     loanReceived = result[0].received;
   }
-  return { loanGiven, loanReceived };
+  return loanGiven - loanReceived;
+}
+async function provisionForExpenseCount() {
+  const result = await Employee.aggregate([
+    {
+      $group: {
+        _id: null,
+        result: { $sum: "$salaryDue" },
+      },
+    },
+  ]);
+  let total = 0;
+  if (result.length > 0) {
+    total = result[0].result;
+  }
+  return total;
 }
 
 async function countAllLiability() {
   let profit = await countProfit();
   let expense = await countExpenses();
-  let bankAndDrawerCash = await countBankAndDrawerCash();
+  // *capitalFund
+  let capitalFund = profit - expense;
+  // !reserver Fund incomplete
+  let reserveFund = await countBankAndDrawerCash();
+  // *
   let ngoLoanReceived = await ngoLoanReceivedMoney();
+  // *
   let totalDeposit = await totalDepositMoney();
-  let employeeSecurityFund = await employeeSecurityFundSum();
+  // *
   let financialBank = await sumBankAmount();
-  let depreciationPrice = await countDepreciationPrice();
+  // *
+  let employeeSecurityFund = await employeeSecurityFundSum();
+  // *
   let loanLossProvision = await countLoanLossProvision();
+  let depreciationPrice = await countDepreciationPrice();
+  let provisionForExpense = await provisionForExpenseCount();
   return {
-    profit,
-    expense,
-    bankAndDrawerCash,
+    capitalFund,
     ngoLoanReceived,
     totalDeposit,
     employeeSecurityFund,
     financialBank,
     depreciationPrice,
     loanLossProvision,
+    provisionForExpense,
   };
 }
 

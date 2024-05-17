@@ -61,6 +61,43 @@ const searchEmployeeController = asyncHandler(async (req, res) => {
 
   return res.json({ data: [data] });
 });
+const searchEmployeeControllerForPaySlip = asyncHandler(async (req, res) => {
+  const number = req.params.id;
+  const { date } = req.query;
+  console.log(date);
+  const employee = await Employee.findOne({ mobileNumber: number })
+    .select("-password")
+    .lean();
+  if (!employee) {
+    return res.status(404).json({ message: "No employee found" });
+  }
+
+  const { _id, branchId, samityId, presentPosition } = employee;
+  const salary = presentPosition.salaryAmount;
+  const countDays = await countOfficeDays(branchId, samityId, date, _id);
+  const { officeAttendanceCount, employeeAttendanceCount } = countDays;
+  let totalAbsent = officeAttendanceCount - employeeAttendanceCount;
+  console.log(totalAbsent);
+  let perDay = salary / 30;
+  let totalAbsentCal = totalAbsent / 2;
+  let absent = totalAbsentCal * perDay;
+  let adjustmentAmount = 0;
+  const providentFund = await PrayingAmount.findOne({
+    employeeId: employee._id,
+  });
+  if (providentFund) {
+    const { adjustmentAmount: amount } = providentFund;
+    adjustmentAmount = amount;
+  }
+
+  const data = {
+    ...employee,
+    totalAbsent: absent,
+    advance: adjustmentAmount,
+  };
+
+  return res.json({ data: [data] });
+});
 
 const setEmployeeCredentialsCredentialsController = asyncHandler(
   async (req, res) => {
@@ -183,4 +220,5 @@ module.exports = {
   getEmployeeAttendanceCountController,
   getEmployeeByBranchAndSamityId,
   getAttendenceCountController,
+  searchEmployeeControllerForPaySlip,
 };

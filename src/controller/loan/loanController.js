@@ -109,6 +109,7 @@ const searchLoanAccountsTransactionsController = asyncHandler(
 
 const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
+  console.log(body);
   const { loanId, amount, addFineAmount, payFineAmount } = body;
   const selectedLoanAccount = await LoanAccount.findOne({ _id: loanId });
   if (addFineAmount > 0) {

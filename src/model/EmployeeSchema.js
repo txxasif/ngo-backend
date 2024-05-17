@@ -43,6 +43,10 @@ const employeeSchema = new Schema({
     additionalTotal: Number,
     employeeSecurityFund: Number,
   },
+  salaryDue: {
+    type: Number,
+    default: 0,
+  },
   guarantorDetails: {
     name: String,
     address: String,
