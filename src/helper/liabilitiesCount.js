@@ -7,53 +7,39 @@ const LocalUser = require("../model/LocalUserSchema");
 const { NgoLoan } = require("../model/NgoLoanSchema");
 const Purchase = require("../model/purchaseSchema");
 const Samity = require("../model/SamitySchema");
+
 async function countProfit() {
-  const loanAccounts = await LoanAccount.find({}).lean();
+  const [loanAccounts, localUsers] = await Promise.all([
+    LoanAccount.find({}).lean(),
+    LocalUser.find({}).lean(),
+  ]);
 
-  let totalProfit = 0;
-  for (let i = 0; i < loanAccounts.length; i++) {
-    if (loanAccounts[i].paid > loanAccounts[i].loanAmount) {
-      totalProfit += loanAccounts[i].paid - loanAccounts[i].loanAmount;
-    }
-  }
-  const localUsers = await LocalUser.find({}).lean();
-  let membershipFee = 0;
+  const totalProfit = loanAccounts.reduce((acc, account) => {
+    return acc + Math.max(0, account.paid - account.loanAmount);
+  }, 0);
 
-  for (let i = 0; i < localUsers.length; i++) {
-    membershipFee += localUsers[i].membershipFee;
-  }
+  const membershipFee = localUsers.reduce(
+    (acc, user) => acc + user.membershipFee,
+    0
+  );
+
   return totalProfit + membershipFee;
 }
-async function countExpenses() {
-  const result = await Expense.aggregate([
-    {
-      $group: {
-        _id: null,
-        total: { $sum: "$total" },
-      },
-    },
-  ]);
-  const result1 = await Purchase.aggregate([
-    {
-      $group: {
-        _id: null,
-        total: { $sum: "$totalPayment" },
-      },
-    },
-  ]);
-  let totalExpenses = 0;
-  let totalPurchases = 0;
-  if (result.length > 0) {
-    totalExpenses = result[0].total;
-  }
-  if (result1.length > 0) {
-    totalPurchases = result1[0].total;
-  }
 
-  console.log(totalExpenses, totalPurchases);
-  //console.log(totalPurchases, totalExpenses);
+async function countExpenses() {
+  const [expenseResult, purchaseResult] = await Promise.all([
+    Expense.aggregate([{ $group: { _id: null, total: { $sum: "$total" } } }]),
+    Purchase.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPayment" } } },
+    ]),
+  ]);
+
+  const totalExpenses = expenseResult[0]?.total || 0;
+  const totalPurchases = purchaseResult[0]?.total || 0;
+
   return totalExpenses + totalPurchases;
 }
+
 async function countBankAndDrawerCash() {
   const result = await Samity.aggregate([
     {
@@ -64,70 +50,38 @@ async function countBankAndDrawerCash() {
       },
     },
   ]);
-  let totalDrawerCash = 0;
-  let totalBankCash = 0;
-  if (result.length > 0) {
-    totalDrawerCash = result[0].totalDrawerCash;
-    totalBankCash = result[0].totalBankCash;
-  }
-  let total = totalBankCash + totalDrawerCash;
-  return total;
+
+  const totalDrawerCash = result[0]?.totalDrawerCash || 0;
+  const totalBankCash = result[0]?.totalBankCash || 0;
+
+  return totalBankCash + totalDrawerCash;
 }
+
 async function ngoLoanReceivedMoney() {
   const result = await NgoLoan.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalReceivedMoney: { $sum: "$amount" },
-      },
-    },
+    { $group: { _id: null, totalReceivedMoney: { $sum: "$amount" } } },
   ]);
-  let totalReceivedMoney = 0;
-  if (result.length > 0) {
-    totalReceivedMoney = result[0].totalReceivedMoney;
-  }
-  return totalReceivedMoney;
+
+  return result[0]?.totalReceivedMoney || 0;
 }
+
 async function totalDepositMoney() {
   const result = await DepositAccount.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalDeposit: { $sum: "$balance" },
-      },
-    },
+    { $group: { _id: null, totalDeposit: { $sum: "$balance" } } },
   ]);
-  let totalDeposit = 0;
-  if (result.length > 0) {
-    totalDeposit = result[0].totalDeposit;
-  }
-  return totalDeposit;
+
+  return result[0]?.totalDeposit || 0;
 }
+
 async function sumBankAmount() {
-  try {
-    const result = await NgoLoan.aggregate([
-      {
-        $match: {
-          institute: "bank",
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalBankAmount: { $sum: "$amount" },
-        },
-      },
-    ]);
-    if (result.length > 0) {
-      return result[0].totalBankAmount;
-    } else {
-      return 0; // Return 0 if no bank loans found
-    }
-  } catch (error) {
-    console.error("Error occurred while summing bank amounts:", error);
-    throw error; // Propagate error to the caller
-  }
+  const result = await NgoLoan.aggregate([
+    { $match: { institute: "bank" } },
+    { $group: { _id: null, totalBankAmount: { $sum: "$amount" } } },
+  ]);
+
+  return result[0]?.totalBankAmount || 0;
 }
+
 async function employeeSecurityFundSum() {
   const result = await Employee.aggregate([
     {
@@ -137,28 +91,18 @@ async function employeeSecurityFundSum() {
       },
     },
   ]);
-  let employeeFund = 0;
-  if (result.length > 0) {
-    employeeFund = result[0].total;
-  }
-  return employeeFund;
+
+  return result[0]?.total || 0;
 }
+
 async function countDepreciationPrice() {
   const result = await Asset.aggregate([
-    {
-      $group: {
-        _id: null,
-        total: { $sum: "$depreciationPrice" },
-      },
-    },
+    { $group: { _id: null, total: { $sum: "$depreciationPrice" } } },
   ]);
-  let depreciationPrice = 0;
-  console.log(depreciationPrice);
-  if (result.length > 0) {
-    depreciationPrice = result[0].total;
-  }
-  return depreciationPrice;
+
+  return result[0]?.total || 0;
 }
+
 async function countLoanLossProvision() {
   const result = await LoanAccount.aggregate([
     {
@@ -169,49 +113,48 @@ async function countLoanLossProvision() {
       },
     },
   ]);
-  let loanGiven = 0;
-  let loanReceived = 0;
-  if (result.length > 0) {
-    loanGiven = result[0].given;
-    loanReceived = result[0].received;
-  }
+
+  const loanGiven = result[0]?.given || 0;
+  const loanReceived = result[0]?.received || 0;
+
   return loanGiven - loanReceived;
 }
+
 async function provisionForExpenseCount() {
   const result = await Employee.aggregate([
-    {
-      $group: {
-        _id: null,
-        result: { $sum: "$salaryDue" },
-      },
-    },
+    { $group: { _id: null, result: { $sum: "$salaryDue" } } },
   ]);
-  let total = 0;
-  if (result.length > 0) {
-    total = result[0].result;
-  }
-  return total;
+
+  return result[0]?.result || 0;
 }
 
 async function countAllLiability() {
-  let profit = await countProfit();
-  let expense = await countExpenses();
-  // *capitalFund
-  let capitalFund = profit - expense;
-  // !reserver Fund incomplete
-  let reserveFund = await countBankAndDrawerCash();
-  // *
-  let ngoLoanReceived = await ngoLoanReceivedMoney();
-  // *
-  let totalDeposit = await totalDepositMoney();
-  // *
-  let financialBank = await sumBankAmount();
-  // *
-  let employeeSecurityFund = await employeeSecurityFundSum();
-  // *
-  let loanLossProvision = await countLoanLossProvision();
-  let depreciationPrice = await countDepreciationPrice();
-  let provisionForExpense = await provisionForExpenseCount();
+  const [
+    profit,
+    expense,
+    reserveFund,
+    ngoLoanReceived,
+    totalDeposit,
+    financialBank,
+    employeeSecurityFund,
+    loanLossProvision,
+    depreciationPrice,
+    provisionForExpense,
+  ] = await Promise.all([
+    countProfit(),
+    countExpenses(),
+    countBankAndDrawerCash(),
+    ngoLoanReceivedMoney(),
+    totalDepositMoney(),
+    sumBankAmount(),
+    employeeSecurityFundSum(),
+    countLoanLossProvision(),
+    countDepreciationPrice(),
+    provisionForExpenseCount(),
+  ]);
+
+  const capitalFund = profit - expense;
+
   return {
     capitalFund,
     ngoLoanReceived,
