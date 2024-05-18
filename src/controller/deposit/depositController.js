@@ -9,6 +9,7 @@ const {
 } = require("../../model/DepositAccountSchema");
 const { message } = require("../../schemaValidation/localUser");
 const LocalUser = require("../../model/LocalUserSchema");
+const mongoose = require("mongoose");
 
 // * create deposit account
 
@@ -109,15 +110,52 @@ const withdrawController = asyncHandler(async (req, res) => {
     .status(200)
     .json({ message: "Withdrawal successful", depositAccount });
 });
+
 const depositAccountListByBrachAndSamityController = asyncHandler(
   async (req, res) => {
     const { branchId, samityId } = req.query;
-    const data = await DepositAccount.find({
-      branchId: branchId,
-      samityId: samityId,
-    }).lean();
-    console.log(data);
 
+    const data = await DepositAccount.aggregate([
+      {
+        $match: {
+          branchId: new mongoose.Types.ObjectId(branchId),
+          samityId: new mongoose.Types.ObjectId(samityId),
+        },
+      },
+      {
+        $lookup: {
+          from: "localusers",
+          localField: "memberId",
+          foreignField: "_id",
+          as: "memberDetails",
+        },
+      },
+      {
+        $unwind: "$memberDetails",
+      },
+      {
+        $project: {
+          _id: 1,
+          memberId: 1,
+          branchId: 1,
+          samityId: 1,
+          paymentTerm: 1,
+          periodOfTimeInMonths: 1,
+          perInstallment: 1,
+          profitPercentage: 1,
+          onMatureAmount: 1,
+          openingDate: 1,
+          matureDate: 1,
+          transactions: 1,
+          withdraws: 1,
+          balance: 1,
+          isOpen: 1,
+          "memberDetails.name": 1,
+          "memberDetails.mobileNumber": 1,
+        },
+      },
+    ]);
+    console.log(data);
     return res.json({ data });
   }
 );
