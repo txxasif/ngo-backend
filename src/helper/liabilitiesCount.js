@@ -9,19 +9,43 @@ const Purchase = require("../model/purchaseSchema");
 const Samity = require("../model/SamitySchema");
 
 async function countProfit() {
-  const [loanAccounts, localUsers] = await Promise.all([
-    LoanAccount.find({}).lean(),
-    LocalUser.find({}).lean(),
+  const loanAccountResult = LoanAccount.aggregate([
+    {
+      $project: {
+        profit: {
+          $cond: {
+            if: { $gt: ["$paid", "$loanAmount"] },
+            then: { $subtract: ["$paid", "$loanAmount"] },
+            else: 0,
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalProfit: { $sum: "$profit" },
+      },
+    },
   ]);
 
-  const totalProfit = loanAccounts.reduce((acc, account) => {
-    return acc + Math.max(0, account.paid - account.loanAmount);
-  }, 0);
+  const localUserResult = LocalUser.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalMembershipFee: { $sum: "$membershipFee" },
+      },
+    },
+  ]);
 
-  const membershipFee = localUsers.reduce(
-    (acc, user) => acc + user.membershipFee,
-    0
-  );
+  const [loanAccountAggregation, localUserAggregation] = await Promise.all([
+    loanAccountResult,
+    localUserResult,
+  ]);
+
+  const totalProfit = loanAccountAggregation[0]?.totalProfit || 0;
+  const membershipFee = localUserAggregation[0]?.totalMembershipFee || 0;
+  console.log(totalProfit);
 
   return totalProfit + membershipFee;
 }
