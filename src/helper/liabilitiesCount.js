@@ -93,7 +93,7 @@ async function totalDepositMoney() {
     {
       $group: {
         _id: null,
-        totalDeposit: { $sum: "$amount" },
+        totalDeposit: { $sum: "$balance" },
       },
     },
   ]);
