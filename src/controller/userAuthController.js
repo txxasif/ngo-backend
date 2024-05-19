@@ -1,6 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
-const User = require("../model/User.Schema");
 const jwt = require("jsonwebtoken");
 const Admin = require("../model/AdminSchema");
 const Employee = require("../model/EmployeeSchema");
@@ -19,7 +18,17 @@ const loginHandler = asyncHandler(async (req, res) => {
     if (!match) {
       return res.status(404).json({ message: " passwords do not match." });
     }
-    return res.json({ type: "admin" });
+    const accessToken = jwt.sign(
+      { role: "admin" },
+      process.env.ADMIN_ACCESS_TOKEN_SECRET,
+      { expiresIn: "1h" }
+    );
+    const refreshToken = jwt.sign(
+      { role: "admin" },
+      process.env.ADMIN_REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+    return res.json({ type: "admin", accessToken, refreshToken });
   } else if (type === "collector") {
     const foundUser = await Employee.findOne({ mobileNumber: phoneNumber });
     if (!foundUser) {
@@ -29,47 +38,51 @@ const loginHandler = asyncHandler(async (req, res) => {
     if (!match) {
       return res.status(404).json({ message: " passwords do not match." });
     }
-    return res.json({ type: "collector" });
+    const accessToken = jwt.sign(
+      { role: "admin" },
+      process.env.COLLECTOR_ACCESS_TOKEN_SECRET,
+      { expiresIn: "3s" }
+    );
+    const refreshToken = jwt.sign(
+      { role: "admin" },
+      process.env.COLLECTOR_REFRESH_TOKEN_SECRET,
+      { expiresIn: "10s" }
+    );
+    return res.json({ type: "collector", accessToken, refreshToken });
   }
 });
-
-const refreshAccessTokenController = (req, res) => {
+const refreshAccessTokenController = asyncHandler(async (req, res) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token is required" });
   }
+  const decode = jwt.decode(refreshToken);
+  console.log(decode);
+  if (!decode || !decode.role) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
 
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, decoded) => {
+  function verifyJWT(token, role) {
+    jwt.verify(refreshToken, token, (err, decode) => {
       if (err) {
         return res.status(403).json({ message: "Forbidden" });
       }
-
-      const foundUser = await User.findOne({
-        username: decoded.username,
-      }).exec();
-
-      if (!foundUser) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            username: foundUser.username,
-            roles: foundUser.roles,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "15m" }
-      );
-
-      res.json({ accessToken });
-    }
-  );
-};
+      let accessToken =
+        role === "admin"
+          ? process.env.ADMIN_ACCESS_TOKEN_SECRET
+          : process.env.COLLECTOR_ACCESS_TOKEN_SECRET;
+      let newAccessToken = jwt.sign({ role: role }, accessToken, {
+        expiresIn: "1h",
+      });
+      return res.json({ token: newAccessToken });
+    });
+  }
+  let tempToken =
+    decode.role === "admin"
+      ? process.env.ADMIN_REFRESH_TOKEN_SECRET
+      : process.env.COLLECTOR_REFRESH_TOKEN_SECRET;
+  verifyJWT(tempToken, decode.role);
+});
 
 module.exports = {
   loginHandler,

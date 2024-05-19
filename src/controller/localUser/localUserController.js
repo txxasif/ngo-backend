@@ -93,8 +93,6 @@ const getUsersByBranchAndSamityId = asyncHandler(async (req, res) => {
   const branchId = req.query.branchId;
   const samityId = req.query.samityId;
   const users = await LocalUser.find({ branchId, samityId });
-  console.log(branchId, samityId);
-  console.log(users);
   res.send({ data: users });
 });
 // get user by id
