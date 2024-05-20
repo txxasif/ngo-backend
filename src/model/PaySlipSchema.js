@@ -9,6 +9,16 @@ const paySlipSchema = new mongoose.Schema(
       ref: "Employee",
       required: true,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
+    samityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Samity",
+      required: true,
+    },
     basicSalary: { type: String, required: true },
     mobileBill: { type: String, required: true },
     tourBill: { type: Number, default: 0 },

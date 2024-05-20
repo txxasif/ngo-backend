@@ -101,9 +101,25 @@ const getUserByIdController = asyncHandler(async (req, res) => {
   const user = await LocalUser.findOne({ _id: id });
   res.json({ data: user });
 });
+const updateUserDetailsController = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const result = await LocalUser.findByIdAndUpdate(
+      { _id: id },
+      { $set: { ...body } }
+    );
+
+    return res.json({ message: "User updated" });
+  } catch (error) {
+    return res.json({ message: "Something went wrong" }).status(400);
+  }
+});
+
 module.exports = {
   addLocalUserController,
   getUserByPhoneNumberController,
   getUsersByBranchAndSamityId,
   getUserByIdController,
+  updateUserDetailsController,
 };

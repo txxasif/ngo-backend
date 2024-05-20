@@ -9,11 +9,13 @@ const {
   getEmployeeByBranchAndSamityId,
   getAttendenceCountController,
   searchEmployeeControllerForPaySlip,
+  updateEmployeeController,
 } = require("../controller/emoloyee/employeeController");
 
 const employeeRoute = express.Router();
 
 employeeRoute.post("/create", createEmployeeController);
+employeeRoute.put("/update/:id", updateEmployeeController);
 employeeRoute.post("/credentials", setEmployeeCredentialsCredentialsController);
 employeeRoute.get("/search/:id", searchEmployeeController);
 employeeRoute.get("/payslip/search/:id", searchEmployeeControllerForPaySlip);

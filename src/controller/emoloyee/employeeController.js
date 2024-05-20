@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const Attendance = require("../../model/EmployeeAttendanceSchema");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
 const countOfficeDays = require("../../helper/countOfficeDays");
+
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
   console.log(employeeBody);
@@ -35,7 +36,19 @@ const createEmployeeController = asyncHandler(async (req, res) => {
   await employee.save();
   res.json({ message: "Done" });
 });
-
+const updateEmployeeController = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const result = await Employee.findByIdAndUpdate(
+      { _id: id },
+      { $set: { ...body } }
+    );
+    return res.status(200).json({ message: "Employee updated" });
+  } catch (error) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+});
 const searchEmployeeController = asyncHandler(async (req, res) => {
   const number = req.params.id;
   const employee = await Employee.findOne({ mobileNumber: number })
@@ -221,4 +234,5 @@ module.exports = {
   getEmployeeByBranchAndSamityId,
   getAttendenceCountController,
   searchEmployeeControllerForPaySlip,
+  updateEmployeeController,
 };
