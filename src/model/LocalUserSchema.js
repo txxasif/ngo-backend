@@ -55,6 +55,7 @@ const memberSchema = new mongoose.Schema({
   mobileNumber: {
     type: String,
     required: true,
+    index: true,
   },
   emergencyContactNumber: {
     type: String,

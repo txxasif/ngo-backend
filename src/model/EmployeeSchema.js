@@ -20,7 +20,11 @@ const employeeSchema = new Schema({
   },
   educationalQualification: String,
   dateOfBirth: Date,
-  mobileNumber: String,
+  mobileNumber: {
+    type: Number,
+    index: true,
+    
+  },
   email: String,
   emergencyContactNumber: String,
   religion: String,

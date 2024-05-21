@@ -20,7 +20,7 @@ const paySlipSchema = new mongoose.Schema(
       required: true,
     },
     basicSalary: { type: String, required: true },
-    mobileBill: { type: String, required: true },
+    mobileBill: { type: String, required: true},
     tourBill: { type: Number, default: 0 },
     overTime: { type: Number, default: 0 },
     specialAward: { type: Number, default: 0 },

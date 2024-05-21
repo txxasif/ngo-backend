@@ -29,9 +29,9 @@ const employeeSchemaValidation = Joi.object({
     "any.required": "Date of birth is required.",
     "date.base": "Invalid date format. Please use YYYY-MM-DD.",
   }),
-  mobileNumber: Joi.string().required().messages({
+  mobileNumber: Joi.number().required().messages({
     "any.required": "Mobile number is required.",
-    "string.base": "Mobile number must be a string.",
+    "string.base": "Mobile number must be a number.",
   }),
   email: Joi.string().email().allow("").messages({
     "string.email": "Invalid email address.",

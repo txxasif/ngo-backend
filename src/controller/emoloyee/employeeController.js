@@ -9,7 +9,6 @@ const countOfficeDays = require("../../helper/countOfficeDays");
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
   console.log(employeeBody);
-
   // Validate employee schema
   const { error } = employeeSchemaValidation.validate(employeeBody);
   console.log(error);
