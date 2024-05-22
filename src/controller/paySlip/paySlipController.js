@@ -32,16 +32,30 @@ const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
 });
 const getEmployeePaySlipByYearAndMonthController = asyncHandler(
   async (req, res) => {
-    // const { year, month } = req.query;
-    // const startDate = new Date(year, month - 1, 1);
-    // const endDate = new Date(year, month, 0);
+    const { branchId, samityId, date } = req.query;
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+    if(!branchId || !samityId){
+      return res.status(400).json({ message: "Invalid branch or samity id" });
+    }
+    
+
+    const month = parsedDate.getMonth(); // Adjust to 1-12 range
+    const year = parsedDate.getFullYear();
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
     const paySlips = await PaySlip.aggregate([
       {
         $match: {
-          // createdAt: {
-          //   $gte: startDate,
-          //   $lte: endDate,
-          // },
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+          branchId: branchId,
+          samityId: samityId,
         },
       },
       {
@@ -76,9 +90,12 @@ const getEmployeePaySlipByYearAndMonthController = asyncHandler(
         },
       },
     ]);
+    console.log(paySlips);
     return res.json(paySlips);
   }
 );
+
+
 module.exports = {
   makeMonthlyPaySlipController,
   getEmployeePaySlipByYearAndMonthController,
