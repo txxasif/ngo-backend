@@ -8,6 +8,7 @@ const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
   const { due, employeeId } = body;
   const employee = await Employee.findOne({ _id: employeeId });
   employee.salaryDue = due;
+  employee.leaveDays = 0;
   await employee.save();
   const isEmployeeAppliedForPrayingAmount = await PrayingAmount.findOne({
     employeeId: body.employeeId,

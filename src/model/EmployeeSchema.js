@@ -51,6 +51,10 @@ const employeeSchema = new Schema({
     type: Number,
     default: 0,
   },
+  leaveDays: {
+  type: Number,
+  default: 0,
+  },
   guarantorDetails: {
     name: String,
     address: String,

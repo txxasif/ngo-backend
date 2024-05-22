@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const Attendance = require("../../model/EmployeeAttendanceSchema");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
 const countOfficeDays = require("../../helper/countOfficeDays");
+const LeaveApplication = require("../../model/leaveApplication");
 
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
@@ -50,6 +51,7 @@ const updateEmployeeController = asyncHandler(async (req, res) => {
 });
 const searchEmployeeController = asyncHandler(async (req, res) => {
   const number = req.params.id;
+  console.log(number);
   const employee = await Employee.findOne({ mobileNumber: number })
     .select("-password")
     .lean();
@@ -84,12 +86,12 @@ const searchEmployeeControllerForPaySlip = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "No employee found" });
   }
 
-  const { _id, branchId, samityId, presentPosition } = employee;
+  const { _id, branchId, samityId, presentPosition ,leaveDays} = employee;
   const salary = presentPosition.salaryAmount;
   const countDays = await countOfficeDays(branchId, samityId, date, _id);
   const { officeAttendanceCount, employeeAttendanceCount } = countDays;
-  let totalAbsent = officeAttendanceCount - employeeAttendanceCount;
-  console.log(totalAbsent);
+  let totalAbsent = officeAttendanceCount - (employeeAttendanceCount + leaveDays);
+
   let perDay = salary / 30;
   let totalAbsentCal = totalAbsent / 2;
   let absent = totalAbsentCal * perDay;
@@ -104,7 +106,7 @@ const searchEmployeeControllerForPaySlip = asyncHandler(async (req, res) => {
 
   const data = {
     ...employee,
-    totalAbsent: absent,
+    totalAbsent: absent < 0 ? 0: absent,
     advance: adjustmentAmount,
   };
 
@@ -223,6 +225,82 @@ const getEmployeeByBranchAndSamityId = asyncHandler(async (req, res) => {
 
   res.json({ data: users });
 });
+const createEmployeeLeaveApplicationController = asyncHandler(async (req,res)=>{
+  const body = req.body;
+  const newLeaveApplication  = new LeaveApplication({...body});
+  await newLeaveApplication.save();
+  console.log(body);
+  return res.json({ message: "done"});
+})
+const employeeLeaveApplicationListController = asyncHandler(async (req,res)=>{
+  const id = req.params.id;
+  const applications = await LeaveApplication.find({employeeId: id});
+  return res.json({data: applications})
+})
+const employeeLeaveApplicationPendingListController = asyncHandler(async (req,res)=>{
+  const applications = await LeaveApplication.aggregate([{
+    $match: {
+      status: "pending"
+    }
+  },{
+    $lookup: {
+      from: "employees",
+      localField: "employeeId",
+      foreignField: "_id",
+      as: "employee"
+    }
+  },{
+    $unwind: "$employee"
+  },{
+    $lookup: {
+      from: "branches",
+      localField: "employee.branchId",
+      foreignField: "_id",
+      as: "branch"
+    }
+  },
+  {
+    $lookup: {
+      from: 'samities',
+      localField: 'employee.samityId',
+      foreignField: '_id',
+      as:'samity'
+    }
+  },
+  {
+    $unwind: "$branch"
+  },
+  {
+    $unwind: "$samity"
+  },
+  {
+    $project: {
+      _id:1,
+      employeeName: "$employee.name",
+      branchName: "$branch.branchName",
+      samityName: "$samity.samityName",
+      days: 1,
+      reason: 1,
+      
+    }
+  }])
+  return res.json({data: applications})
+})
+const employeeLeaveApplicationAcceptOrRejectController = asyncHandler(async(req,res)=>{
+  const {id,status} = req.body;
+  await Employee.updateMany({},{$set:{leaveDays:0}})
+  const application = await LeaveApplication.findById(id);
+  if(status === "accepted"){
+    application.status = "accepted";
+    const  employee = await Employee.findById(application.employeeId);
+    employee.leaveDays = application.days
+    await employee.save();
+  }else{
+    application.status = "rejected";
+  }
+  await application.save();
+  return res.json({message: "success"})
+})
 module.exports = {
   createEmployeeController,
   searchEmployeeController,
@@ -233,5 +311,9 @@ module.exports = {
   getEmployeeByBranchAndSamityId,
   getAttendenceCountController,
   searchEmployeeControllerForPaySlip,
+  createEmployeeLeaveApplicationController,
+  employeeLeaveApplicationListController,
+  employeeLeaveApplicationPendingListController,
   updateEmployeeController,
+  employeeLeaveApplicationAcceptOrRejectController
 };
