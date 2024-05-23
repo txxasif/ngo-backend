@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const LocalUser = require("../../model/LocalUserSchema");
 const localUserSchema = require("../../schemaValidation/localUser");
+const mongoose = require("mongoose");
 
 // * add brunch controller
 const addLocalUserController = asyncHandler(async (req, res) => {
@@ -116,10 +117,81 @@ const updateUserDetailsController = asyncHandler(async (req, res) => {
   }
 });
 
+// local user pending list
+const localUserPendingListController = asyncHandler(async (req, res) => {
+  console.log('hit')
+  const users = await LocalUser.aggregate([{
+    $match:{status: "pending"}
+  },{
+    $lookup: {
+      from: "branches",
+      localField: "branchId",
+      foreignField: "_id",
+      as: "branch",
+    },
+
+  }, {
+    $lookup: {
+      from: "samities",
+      localField: "samityId",
+      foreignField: "_id",
+      as: "samity",
+    },
+  },
+  {
+    $unwind : "$branch"
+  }, {
+    $unwind : "$samity"
+  },
+   {
+    $project: {
+      _id: 1,
+      name: 1,
+      branchName: "$branch.branchName",
+      samityName: "$samity.samityName",
+      mobileNumber: 1
+    },
+  }])
+  console.log(users,'--------');
+  res.json({ data: users });
+});
+
+const acceptUserRequestController = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const { status } = req.query;
+  const id = new mongoose.Types.ObjectId(_id)
+  console.log(id,_id,status);
+
+  try{
+    if (status === "rejected") {
+      try {
+        await LocalUser.findByIdAndDelete({_id:id});
+        return res.json({ message: "User deleted successfully" });
+      } catch (error) {
+        console.error(error);
+       return  res.status(500).json({ message: "Error deleting user" });
+      }
+    } else {
+
+    
+     await LocalUser.findByIdAndUpdate(
+        { _id: id },
+        { $set: { status: 'accepted' } }
+      );
+     return  res.json({ message : "User accepted successfully" });
+    }
+  }catch(error){
+    console.error(error);
+    return  res.status(500).json({ message: "Error updating user" });
+  }
+});
+
 module.exports = {
   addLocalUserController,
   getUserByPhoneNumberController,
   getUsersByBranchAndSamityId,
   getUserByIdController,
   updateUserDetailsController,
+  localUserPendingListController,
+  acceptUserRequestController
 };
