@@ -2,10 +2,17 @@ const asyncHandler = require("express-async-handler");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
 const PaySlip = require("../../model/PaySlipSchema");
 const Employee = require("../../model/EmployeeSchema");
+const moment = require("moment");
+const { default: mongoose } = require("mongoose");
+
 
 const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
   const body = req.body;
-  const { due, employeeId } = body;
+
+  const { due, employeeId,date: d } = body;
+  let date = moment(d);
+  let minusDate = date.subtract(1,'months');
+  body['date'] = minusDate;
   const employee = await Employee.findOne({ _id: employeeId });
   employee.salaryDue = due;
   employee.leaveDays = 0;
@@ -40,22 +47,19 @@ const getEmployeePaySlipByYearAndMonthController = asyncHandler(
     if(!branchId || !samityId){
       return res.status(400).json({ message: "Invalid branch or samity id" });
     }
-    
-
     const month = parsedDate.getMonth(); // Adjust to 1-12 range
     const year = parsedDate.getFullYear();
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
-
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month+1, 0);
     const paySlips = await PaySlip.aggregate([
       {
         $match: {
-          createdAt: {
+          date: {
             $gte: startDate,
             $lte: endDate,
           },
-          branchId: branchId,
-          samityId: samityId,
+          branchId: new mongoose.Types.ObjectId(branchId),
+          samityId: new mongoose.Types.ObjectId(samityId),
         },
       },
       {
@@ -71,7 +75,7 @@ const getEmployeePaySlipByYearAndMonthController = asyncHandler(
       },
       {
         $sort: {
-          createdAt: -1,
+          date: -1,
         },
       },
       {
@@ -90,7 +94,6 @@ const getEmployeePaySlipByYearAndMonthController = asyncHandler(
         },
       },
     ]);
-    console.log(paySlips);
     return res.json(paySlips);
   }
 );

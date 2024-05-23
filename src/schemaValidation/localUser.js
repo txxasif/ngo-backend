@@ -4,9 +4,6 @@ const localUserSchema = Joi.object({
     "any.required": "Name is required",
     "string.empty": "Name must not be empty",
   }),
-  fromAdmin: Joi.boolean().required().messages({
-    "any.required": "fromAdmin field is required",
-  }),
   branchId: Joi.string().required().messages({
     "any.required": "Branch ID is required",
   }),
@@ -71,7 +68,7 @@ const localUserSchema = Joi.object({
     "any.required": "Photo is required",
     "string.empty": "Photo must not be empty",
   }),
-  status: Joi.string().valid("Active", "Deactive").required().messages({
+  status: Joi.string().valid("pending", "accepted").required().messages({
     "any.required": "Status is required",
     "string.empty": "Status must not be empty",
     "any.only": "Status must be either Active or Deactive",

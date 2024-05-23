@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { type } = require("../schemaValidation/localUser");
 
 const deductionSchema = new mongoose.Schema({});
 
@@ -28,6 +29,7 @@ const paySlipSchema = new mongoose.Schema(
     total: { type: Number, default: 0 },
     totalPaid: { type: Number, default: 0 },
     due: { type: Number, default: 0 },
+    date: {type: Date},
     deduction: {
       advance: { type: Number, default: 0 },
       ait: { type: Number, default: 0 },

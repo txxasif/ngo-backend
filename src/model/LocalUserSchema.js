@@ -5,10 +5,6 @@ const memberSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  fromAdmin: {
-    type: Boolean,
-    required: true,
-  },
   branchId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Branch",
@@ -71,8 +67,7 @@ const memberSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Active", "Deactive"],
-    default: "Active",
+    enum: ["pending", "accepted","rejected"],
   },
   nominee: {
     type: {
