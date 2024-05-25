@@ -13,6 +13,10 @@ const depositAccountSchema = Joi.object({
     "any.required": "Samity ID is required.",
     "string.base": "Samity ID must be a string.",
   }),
+  status: Joi.string().required().messages({
+    "any.required": "Status is required.",
+    "string.base": "Status must be a string.",
+  }),
   paymentTerm: Joi.string()
     .valid(
       "Daily",

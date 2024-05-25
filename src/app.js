@@ -21,6 +21,7 @@ const paySlipRoute = require("./routes/paySlipRoute");
 const assetRoute = require("./routes/assetRoute");
 const adminRoute = require("./routes/adminRoute");
 const liabilitiesRoute = require("./routes/liabilitiesRoute");
+const { DepositAccount } = require("./model/DepositAccountSchema");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -43,6 +44,9 @@ app.use("/praying-application", prayingAmountRoute);
 app.use("/pay-slip", paySlipRoute);
 app.use("/asset", assetRoute);
 app.use("/liabilities", liabilitiesRoute);
+app.get('/script', async (req, res) => {
+
+})
 app.get("/api-docs", sitemap(app));
 app.all("*", (req, res) => {
   res.status(404);

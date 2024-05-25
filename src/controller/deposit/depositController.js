@@ -7,7 +7,6 @@ const {
   Withdraw,
   Transaction,
 } = require("../../model/DepositAccountSchema");
-const { message } = require("../../schemaValidation/localUser");
 const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
 
@@ -32,6 +31,94 @@ const createDepositAccountController = asyncHandler(async (req, res) => {
     .status(200)
     .json({ message: "Deposit account created successfully" });
 });
+const getPendingDepositAccountList = asyncHandler(async (req, res) => {
+  const { samityId, branchId } = req.query;
+  const depositAccountList = await DepositAccount.aggregate([
+    {
+      $match: {
+        samityId: new mongoose.Types.ObjectId(samityId),
+        branchId: new mongoose.Types.ObjectId(branchId),
+        status: "pending",
+      },
+    },
+    {
+      $lookup: {
+        from: "localusers",
+        localField: "memberId",
+        foreignField: "_id",
+        as: "member",
+      },
+    }, {
+      $unwind: "$member"
+    },
+    {
+      $lookup: {
+        from: "branches",
+        localField: "branchId",
+        foreignField: "_id",
+        as: "branch"
+      }
+    },
+    {
+      $unwind: "$branch"
+    },
+    {
+      $lookup: {
+        from: "samities",
+        localField: "samityId",
+        foreignField: "_id",
+        as: "samity"
+      }
+    },
+    {
+      $unwind: "$samity"
+    },
+
+    {
+      $project: {
+        _id: 1,
+        phoneNumber: "$member.mobileNumber",
+        name: "$member.name",
+        branchName: "$branch.branchName",
+        samityName: "$samity.samityName",
+        paymentTerm: 1,
+        profitPercentage: 1,
+        onMatureAmount: 1,
+      },
+    },
+  ])
+  return res.json({ data: depositAccountList })
+})
+const acceptPendingDepositList = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const id = new mongoose.Types.ObjectId(_id);
+  const { status } = req.query;
+  const check = status === 'approved' || 'closed' || 'rejected' ? true : false;
+  if (!check) {
+    return res.json({ message: "Status type isn't valid" }).status(404);
+  }
+  try {
+    if (status === "rejected") {
+      try {
+        await DepositAccount.findByIdAndDelete({ _id: id });
+        return res.json({ message: "Saving Account Rejected." });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error rejecting Saving Account" });
+      }
+    } else {
+      await DepositAccount.findByIdAndUpdate(
+        { _id: id },
+        { $set: { status: status } }
+      );
+      return res.json({ message: "Saving Account Approved." });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error updating saving Account." });
+  }
+
+})
 // * search deposit account
 const searchDepositAccountController = asyncHandler(async (req, res) => {
   const phone = req.params.id;
@@ -155,14 +242,73 @@ const depositAccountListByBrachAndSamityController = asyncHandler(
         },
       },
     ]);
-    console.log(data);
     return res.json({ data });
   }
 );
+const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
+  const phone = req.params.id;
+  const pipeline = [
+    {
+      $match: { mobileNumber: phone }, // Filter by mobile number
+    },
+    {
+      $lookup: {
+        from: "samities", // Local field to join on
+        localField: "samityId",
+        foreignField: "_id", // Foreign field to join on
+        as: "samityDetails", // Alias for joined data
+      },
+    },
+    {
+      $lookup: {
+        from: "branches",
+        localField: "branchId",
+        foreignField: "_id",
+        as: "branchDetails",
+      },
+    },
+    {
+      $unwind: "$samityDetails", // Unwind single document array from lookup
+    },
+    {
+      $unwind: "$branchDetails", // Unwind single document array from lookup
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        photo: 1,
+        samityName: "$samityDetails.samityName", // Access nested data
+        branchName: "$branchDetails.branchName", // Access nested data
+      },
+    },
+  ];
+  const user = await LocalUser.aggregate(pipeline);
+  if (!user.length) {
+    console.log("erro");
+    return res.status(404).json({ message: "No user data available" });
+  }
+  const isDepositAccount = await DepositAccount.find({
+    memberId: user[0]._id,
+  })
+    .select(
+      "paymentTerm onMatureAmount openingDate matureDate balance paid"
+    )
+    .lean();
+  if (!isDepositAccount) {
+    return res.status(404).json({ message: "No Loan Account Available" });
+  }
+  const finalResponse = { userDetails: user[0], depositAccounts: isDepositAccount };
+
+  res.json({ data: finalResponse })
+})
+
 module.exports = {
   createDepositAccountController,
   makeDepositController,
   searchDepositAccountController,
   withdrawController,
   depositAccountListByBrachAndSamityController,
+  getPendingDepositAccountList, acceptPendingDepositList,
+  depositAccountListsByPhoneNumber
 };

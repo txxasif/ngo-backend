@@ -72,7 +72,6 @@ const searchLoanAccountController = asyncHandler(async (req, res) => {
     },
   ];
   const user = await LocalUser.aggregate(pipeline);
-  console.log(user);
   if (!user.length) {
     console.log("erro");
     return res.status(404).json({ message: "No user data available" });
@@ -87,9 +86,7 @@ const searchLoanAccountController = asyncHandler(async (req, res) => {
   if (!isLoanAccount) {
     return res.status(404).json({ message: "No Loan Account Available" });
   }
-  delete isLoanAccount._id;
   const finalResponse = { userDetails: user[0], loanAccounts: isLoanAccount };
-  console.log(finalResponse);
   return res.status(200).json({ data: [finalResponse] });
 });
 // ?search transactions of loan accounts
@@ -135,7 +132,6 @@ const getLoanAccountsByBranchAndSamityId = asyncHandler(async (req, res) => {
       paymentTerm != "null"
         ? { branchId, samityId, paymentTerm }
         : { branchId, samityId };
-    console.log(params);
 
     const loanAccounts = await LoanAccount.aggregate([
       // Match documents based on provided parameters

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { type } = require("../schemaValidation/localUser");
 // Transaction Schema
 const transactionSchema = new mongoose.Schema(
   {
@@ -95,9 +94,10 @@ const depositAccountSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    isOpen: {
-      type: Boolean,
-    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'closed']
+    }
   },
   {
     timestamps: true,
