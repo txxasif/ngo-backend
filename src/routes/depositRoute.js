@@ -8,15 +8,18 @@ const {
   depositAccountListByBrachAndSamityController,
   getPendingDepositAccountList,
   depositAccountListsByPhoneNumber
+  , getSpecificDetailsForDepositAccountController, transactionDetailsController
 } = require("../controller/deposit/depositController");
 const depositRoute = express.Router();
 
 depositRoute.post("/create", createDepositAccountController);
 depositRoute.post("/makeDeposit", makeDepositController);
+depositRoute.post("/makeWithdraw", withdrawController);
 depositRoute.get("/pending", getPendingDepositAccountList);
 depositRoute.get("/accept/:id", acceptPendingDepositList);
+depositRoute.get("/deposit-account/:id", getSpecificDetailsForDepositAccountController);
+depositRoute.get("/transaction/:id", transactionDetailsController);
 depositRoute.get("/list", depositAccountListByBrachAndSamityController);
-depositRoute.post("/makeWithdraw", withdrawController);
 depositRoute.get('/account/list/:id', depositAccountListsByPhoneNumber);
 depositRoute.get("/search/:id", searchDepositAccountController);
 

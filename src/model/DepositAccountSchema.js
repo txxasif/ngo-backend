@@ -2,6 +2,31 @@ const mongoose = require("mongoose");
 // Transaction Schema
 const transactionSchema = new mongoose.Schema(
   {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DepositAccount",
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    }
+  },
+  {
+    timestamps: true,
+  }
+);
+const withdrawSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DepositAccount",
+      required: true,
+    },
     date: {
       type: Date,
       required: true,
@@ -11,23 +36,10 @@ const transactionSchema = new mongoose.Schema(
       required: true,
     },
     description: {
-      type: String,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
-const withdrawSchema = new mongoose.Schema(
-  {
-    date: {
-      type: Date,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
+      type: String
+    }
+
+
   },
   {
     timestamps: true,

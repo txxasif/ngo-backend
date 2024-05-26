@@ -139,32 +139,32 @@ const searchDepositAccountController = asyncHandler(async (req, res) => {
   return res.status(200).json({ data: [finalResponse] });
 });
 const makeDepositController = asyncHandler(async (req, res) => {
-  const { date, amount, description, memberId } = req.body;
-  if (!date || !amount || !description || !memberId) {
+  const { date, amount, description, id } = req.body;
+  if (!date || !amount || !description || !id) {
     return res.status(404).json({ message: "All Fields are Required" });
   }
-  const depositAccount = await DepositAccount.findOne({ memberId: memberId });
+  const depositAccount = await DepositAccount.findOne({ _id: id });
   if (!depositAccount) {
     return res.status(404).json({ error: "Deposit account not found" });
   }
   depositAccount.balance += Number(amount);
-  const transaction = new Transaction({ date, amount, description });
-  depositAccount.transactions.push(transaction);
+  const transaction = new Transaction({ accountId: id, date, amount, description });
+  await transaction.save();
   await depositAccount.save();
   return res.status(200).json({ message: "Deposit money saved successfully" });
 });
 
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
-  const { memberId, amount } = req.body;
+  const { id, amount, date, description } = req.body;
 
   // Validate memberId and amount
-  if (!memberId || !amount || isNaN(amount) || amount <= 0) {
+  if (!id || !amount || isNaN(amount) || amount <= 0 || !date) {
     return res.status(400).json({ message: "Invalid memberId or amount" });
   }
 
   // Find the deposit account by memberId
-  let depositAccount = await DepositAccount.findOne({ memberId });
+  let depositAccount = await DepositAccount.findOne({ _id: id });
 
   if (!depositAccount) {
     return res.status(404).json({ message: "Deposit account not found" });
@@ -182,12 +182,14 @@ const withdrawController = asyncHandler(async (req, res) => {
 
   // Create a new withdrawal
   const withdrawal = new Withdraw({
-    date: new Date(),
+    accountId: id,
+    date,
+    description: description,
     amount,
   });
 
   // Add the withdrawal to deposit account
-  depositAccount.withdraws.push(withdrawal);
+  await withdrawal.save();
 
   // Save the updated deposit account
   await depositAccount.save();
@@ -302,7 +304,62 @@ const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
 
   res.json({ data: finalResponse })
 })
-
+const getSpecificDetailsForDepositAccountController = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const id = new mongoose.Types.ObjectId(_id);
+  const data = await DepositAccount.aggregate([
+    {
+      $match: {
+        _id: id
+      }
+    },
+    {
+      $lookup: {
+        from: "localusers",
+        localField: "memberId",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    {
+      $unwind: "$user"
+    },
+    {
+      $project: {
+        _id: 1,
+        memberId: 1,
+        paymentTerm: 1,
+        periodOfTimeInMonths: 1,
+        perInstallment: 1,
+        profitPercentage: 1,
+        onMatureAmount: 1,
+        openingDate: 1,
+        matureDate: 1,
+        balance: 1,
+        status: 1,
+        memberDetails: {
+          name: "$user.name",
+          mobileNumber: "$user.mobileNumber"
+        }
+      }
+    }
+  ])
+  return res.json({ data })
+})
+const transactionDetailsController = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const id = new mongoose.Types.ObjectId(_id);
+  const data = await Transaction.aggregate([{
+    $match: {
+      accountId: id
+    }
+  }, {
+    $sort: {
+      date: -1
+    }
+  }])
+  return res.json({ data })
+})
 module.exports = {
   createDepositAccountController,
   makeDepositController,
@@ -310,5 +367,7 @@ module.exports = {
   withdrawController,
   depositAccountListByBrachAndSamityController,
   getPendingDepositAccountList, acceptPendingDepositList,
-  depositAccountListsByPhoneNumber
+  depositAccountListsByPhoneNumber,
+  getSpecificDetailsForDepositAccountController
+  , transactionDetailsController
 };
