@@ -16,6 +16,10 @@ const depositTransactionSchema = new mongoose.Schema(
         amount: {
             type: Number,
             required: true,
+        },
+        description: {
+            type: String,
+
         }
     },
     {

@@ -360,6 +360,21 @@ const transactionDetailsController = asyncHandler(async (req, res) => {
   }])
   return res.json({ data })
 })
+const withdrawDetailsController = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const id = new mongoose.Types.ObjectId(_id);
+  const data = await Withdraw.aggregate([{
+    $match: {
+      accountId: id
+    }
+  }, {
+    $sort: {
+      date: -1
+    }
+  }])
+  console.log(data);
+  return res.json({ data })
+})
 module.exports = {
   createDepositAccountController,
   makeDepositController,
@@ -370,4 +385,5 @@ module.exports = {
   depositAccountListsByPhoneNumber,
   getSpecificDetailsForDepositAccountController
   , transactionDetailsController
+  , withdrawDetailsController
 };
