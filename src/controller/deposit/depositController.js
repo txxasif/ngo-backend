@@ -140,17 +140,23 @@ const searchDepositAccountController = asyncHandler(async (req, res) => {
 });
 const makeDepositController = asyncHandler(async (req, res) => {
   const { date, amount, description, id } = req.body;
-  if (!date || !amount || !description || !id) {
+  console.log(req.body);
+  if (!date || !amount || !id) {
+    console.log('returned');
     return res.status(404).json({ message: "All Fields are Required" });
   }
+  console.log('hit');
   const depositAccount = await DepositAccount.findOne({ _id: id });
   if (!depositAccount) {
     return res.status(404).json({ error: "Deposit account not found" });
   }
+  console.log('hit 2');
   depositAccount.balance += Number(amount);
+  console.log(depositAccount);
   const transaction = new Transaction({ accountId: id, date, amount, description });
   await transaction.save();
   await depositAccount.save();
+  console.log('hit 3');
   return res.status(200).json({ message: "Deposit money saved successfully" });
 });
 

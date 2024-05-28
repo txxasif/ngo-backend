@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const Samity = require("../../model/SamitySchema");
 const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaValidation");
 const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
+const { DepositAccount } = require("../../model/DepositAccountSchema");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -99,8 +100,10 @@ const searchLoanAccountsTransactionsController = asyncHandler(
     const transactionDetails = await LoanTransaction.find({ loanId: id }).sort({
       createdAt: -1,
     });
-
-    return res.json({ data: { transactionDetails, loanAccountDetails } });
+    const memberId = loanAccountDetails.memberId;
+    const depositAccounts = await DepositAccount.find({ memberId: memberId }).select('balance _id').lean();
+    console.log(depositAccounts);
+    return res.json({ data: { transactionDetails, loanAccountDetails, depositAccounts } });
   }
 );
 
