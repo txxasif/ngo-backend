@@ -19,6 +19,17 @@ const loanAccountValidationSchema = Joi.object({
       "any.only": "Invalid payment term.",
       "any.required": "Payment term is required.",
     }),
+  status: Joi.string()
+    .valid(
+      "pending",
+      "approved",
+      "closed",
+    )
+    .required()
+    .messages({
+      "any.only": "Invalid Status.",
+      "any.required": "Status is Required.",
+    }),
   loanAmount: Joi.number().required().messages({
     "any.required": "Loan amount is required.",
     "number.base": "Loan amount must be a number.",

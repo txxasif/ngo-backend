@@ -95,15 +95,19 @@ const searchLoanAccountsTransactionsController = asyncHandler(
   async (req, res) => {
     const id = req.params.id;
     const loanAccountDetails = await LoanAccount.findOne({ _id: id })
-      .select("-periodOfTimeInMonths -closingRequest ")
-      .lean();
+    let isCloseAble = loanAccountDetails.paid >= loanAccountDetails.totalAmount && loanAccountDetails.loanFinePaid >= loanAccountDetails.loanFine;
+    console.log(isCloseAble);
+    if (isCloseAble) {
+      loanAccountDetails.status = "closed";
+      await loanAccountDetails.save();
+    }
     const transactionDetails = await LoanTransaction.find({ loanId: id }).sort({
       createdAt: -1,
     });
+
     const memberId = loanAccountDetails.memberId;
     const depositAccounts = await DepositAccount.find({ memberId: memberId }).select('balance _id').lean();
-    console.log(depositAccounts);
-    return res.json({ data: { transactionDetails, loanAccountDetails, depositAccounts } });
+    return res.json({ data: { transactionDetails, loanAccountDetails, depositAccounts, isCloseAble } });
   }
 );
 
@@ -274,7 +278,94 @@ const ngoLoanPaymentDetailsByLoanIdController = asyncHandler(
     return res.json({ data });
   }
 );
+const getPendingLoanAccountList = asyncHandler(async (req, res) => {
+  const { samityId, branchId } = req.query;
+  const depositAccountList = await LoanAccount.aggregate([
+    {
+      $match: {
+        samityId: new mongoose.Types.ObjectId(samityId),
+        branchId: new mongoose.Types.ObjectId(branchId),
+        status: "pending",
+      },
+    },
+    {
+      $lookup: {
+        from: "localusers",
+        localField: "memberId",
+        foreignField: "_id",
+        as: "member",
+      },
+    }, {
+      $unwind: "$member"
+    },
+    {
+      $lookup: {
+        from: "branches",
+        localField: "branchId",
+        foreignField: "_id",
+        as: "branch"
+      }
+    },
+    {
+      $unwind: "$branch"
+    },
+    {
+      $lookup: {
+        from: "samities",
+        localField: "samityId",
+        foreignField: "_id",
+        as: "samity"
+      }
+    },
+    {
+      $unwind: "$samity"
+    },
 
+    {
+      $project: {
+        _id: 1,
+        phoneNumber: "$member.mobileNumber",
+        name: "$member.name",
+        branchName: "$branch.branchName",
+        samityName: "$samity.samityName",
+        paymentTerm: 1,
+        profitPercentage: 1,
+        loanAmount: 1,
+      },
+    },
+  ])
+  return res.json({ data: depositAccountList })
+})
+const acceptPendingLoanList = asyncHandler(async (req, res) => {
+  const _id = req.params.id;
+  const id = new mongoose.Types.ObjectId(_id);
+  const { status } = req.query;
+  const check = status === 'approved' || 'closed' || 'rejected' ? true : false;
+  if (!check) {
+    return res.json({ message: "Status type isn't valid" }).status(404);
+  }
+  try {
+    if (status === "rejected") {
+      try {
+        await LoanAccount.findByIdAndDelete({ _id: id });
+        return res.json({ message: "Loan Account Rejected." });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error rejecting Saving Account" });
+      }
+    } else {
+      await LoanAccount.findByIdAndUpdate(
+        { _id: id },
+        { $set: { status: status } }
+      );
+      return res.json({ message: "Saving Account Approved." });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error updating saving Account." });
+  }
+
+})
 module.exports = {
   createNewLoanAccountController,
   searchLoanAccountController,
@@ -285,5 +376,7 @@ module.exports = {
   ngoLoanCreateController,
   ngoLoanPaymentDetailsByLoanIdController,
   ngoLoanPayController,
+  getPendingLoanAccountList,
   ngoLoanPayListController,
+  acceptPendingLoanList
 };

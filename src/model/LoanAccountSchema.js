@@ -91,10 +91,6 @@ const loanAccountSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    isClosed: {
-      type: Boolean,
-      default: false,
-    },
     loanFine: {
       type: Number,
       default: 0,
@@ -106,6 +102,10 @@ const loanAccountSchema = new mongoose.Schema(
     closingRequest: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'closed']
     },
     paid: {
       type: Number,
