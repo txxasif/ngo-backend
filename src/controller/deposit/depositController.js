@@ -295,7 +295,7 @@ const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
     console.log("erro");
     return res.status(404).json({ message: "No user data available" });
   }
-  const savingsAccounts = await SavingsAccount.find({ memberId: user[0]._id }).select("_id status openingDate balance balanceWithProfit paymentTerm").lean();
+  const savingsAccounts = await SavingsAccount.find({ memberId: user[0]._id }).select("_id status openingDate balance totalDeposit paymentTerm").lean();
   const fdrAccounts = await FdrAccount.find({ memberId: user[0]._id }).select("_id status openingDate matureDate balance balanceWithProfit paymentTerm").lean();
   const dpsAccounts = await DpsAccount.find({ memberId: user[0]._id }).select("_id status openingDate balance matureDate balanceWithProfit paymentTerm").lean();
   const isDepositAccount = await DepositAccount.find({
@@ -310,7 +310,7 @@ const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
   }
   const finalResponse = { userDetails: user[0], depositAccounts: isDepositAccount, savingsAccounts, fdrAccounts, dpsAccounts };
 
-  res.json({ data: finalResponse })
+  res.json({ data: finalResponse });
 })
 const getSpecificDetailsForDepositAccountController = asyncHandler(async (req, res) => {
   const _id = req.params.id;

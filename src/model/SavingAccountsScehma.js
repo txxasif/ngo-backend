@@ -1,50 +1,5 @@
 const mongoose = require("mongoose");
-// Transaction Schema
-const transactionSchema = new mongoose.Schema(
-  {
-    accountId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "DepositAccount",
-      required: true,
-    },
-    date: {
-      type: Date,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    }
-  },
-  {
-    timestamps: true,
-  }
-);
-const withdrawSchema = new mongoose.Schema(
-  {
-    accountId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "DepositAccount",
-      required: true,
-    },
-    date: {
-      type: Date,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    description: {
-      type: String
-    }
 
-
-  },
-  {
-    timestamps: true,
-  }
-);
 const savingsAccountSchema = new mongoose.Schema(
   {
     memberId: {
@@ -80,7 +35,6 @@ const savingsAccountSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
     openingDate: {
       type: Date,
       required: true,
@@ -89,7 +43,7 @@ const savingsAccountSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    balanceWithProfit: {
+    totalDeposit: {
       type: Number,
       default: 0,
     },

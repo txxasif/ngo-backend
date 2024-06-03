@@ -72,7 +72,7 @@ const fdrAccountSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        balanceWithProfit: {
+        totalDeposit: {
             type: Number,
             default: 0,
         },
