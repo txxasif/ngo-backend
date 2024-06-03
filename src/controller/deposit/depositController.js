@@ -9,6 +9,9 @@ const {
 } = require("../../model/DepositAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
 const mongoose = require("mongoose");
+const { SavingsAccount } = require("../../model/SavingAccountsScehma");
+const { FdrAccount } = require("../../model/FdrAccountSchema");
+const { DpsAccount } = require("../../model/DpsAccountSchema");
 
 // * create deposit account
 
@@ -292,6 +295,9 @@ const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
     console.log("erro");
     return res.status(404).json({ message: "No user data available" });
   }
+  const savingsAccounts = await SavingsAccount.find({ memberId: user[0]._id }).select("_id status openingDate balance balanceWithProfit paymentTerm").lean();
+  const fdrAccounts = await FdrAccount.find({ memberId: user[0]._id }).select("_id status openingDate matureDate balance balanceWithProfit paymentTerm").lean();
+  const dpsAccounts = await DpsAccount.find({ memberId: user[0]._id }).select("_id status openingDate balance matureDate balanceWithProfit paymentTerm").lean();
   const isDepositAccount = await DepositAccount.find({
     memberId: user[0]._id,
   })
@@ -302,7 +308,7 @@ const depositAccountListsByPhoneNumber = asyncHandler(async (req, res) => {
   if (!isDepositAccount) {
     return res.status(404).json({ message: "No Loan Account Available" });
   }
-  const finalResponse = { userDetails: user[0], depositAccounts: isDepositAccount };
+  const finalResponse = { userDetails: user[0], depositAccounts: isDepositAccount, savingsAccounts, fdrAccounts, dpsAccounts };
 
   res.json({ data: finalResponse })
 })

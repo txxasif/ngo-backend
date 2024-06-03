@@ -80,11 +80,16 @@ const savingsAccountSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
     openingDate: {
       type: Date,
       required: true,
     },
     balance: {
+      type: Number,
+      default: 0,
+    },
+    balanceWithProfit: {
       type: Number,
       default: 0,
     },
@@ -123,9 +128,5 @@ const savingsAccountSchema = new mongoose.Schema(
 const SavingsAccount =
   mongoose.models.SavingsAccount ||
   mongoose.model("SavingsAccount", savingsAccountSchema);
-const Transaction =
-  mongoose.models.Transaction ||
-  mongoose.model("Transaction", transactionSchema);
-const Withdraw =
-  mongoose.models.Withdraw || mongoose.model("Withdraw", withdrawSchema);
-module.exports = { SavingsAccount, Withdraw, Transaction };
+
+module.exports = { SavingsAccount };

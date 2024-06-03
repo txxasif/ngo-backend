@@ -1,50 +1,5 @@
 const mongoose = require("mongoose");
-// Transaction Schema
-const transactionSchema = new mongoose.Schema(
-    {
-        accountId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "DepositAccount",
-            required: true,
-        },
-        date: {
-            type: Date,
-            required: true,
-        },
-        amount: {
-            type: Number,
-            required: true,
-        }
-    },
-    {
-        timestamps: true,
-    }
-);
-const withdrawSchema = new mongoose.Schema(
-    {
-        accountId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "DepositAccount",
-            required: true,
-        },
-        date: {
-            type: Date,
-            required: true,
-        },
-        amount: {
-            type: Number,
-            required: true,
-        },
-        description: {
-            type: String
-        }
 
-
-    },
-    {
-        timestamps: true,
-    }
-);
 const dpsAccountSchema = new mongoose.Schema(
     {
         memberId: {
@@ -131,9 +86,5 @@ const dpsAccountSchema = new mongoose.Schema(
 const DpsAccount =
     mongoose.models.DpsAccount ||
     mongoose.model("DpsAccount", dpsAccountSchema);
-const Transaction =
-    mongoose.models.Transaction ||
-    mongoose.model("Transaction", transactionSchema);
-const Withdraw =
-    mongoose.models.Withdraw || mongoose.model("Withdraw", withdrawSchema);
-module.exports = { DpsAccount, Withdraw, Transaction };
+
+module.exports = { DpsAccount };
