@@ -11,8 +11,13 @@ const createFdrAccountController = asyncHandler(async (req, res) => {
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
+    const { onMatureAmount } = fdrBody;
+    const newBody = {
+        balance: onMatureAmount,
+        ...fdrBody
+    }
 
-    const newFdrAccount = await FdrAccount.create(fdrBody);
+    const newFdrAccount = await FdrAccount.create(newBody);
     if (!newFdrAccount) {
         return res.status(404).json({ message: "Something Went Wrong" });
     }
@@ -47,12 +52,11 @@ const getSpecificDetailsForFdrAccountController = asyncHandler(async (req, res) 
                 paymentTerm: 1,
                 type: 1,
                 periodOfTimeInMonths: 1,
-                perInstallment: 1,
-                onMatureAmount: 1,
+                profitPerInstallment: 1,
                 profitPercentage: 1,
                 openingDate: 1,
                 balance: 1,
-                totalDeposit: 1,
+                totalWithdraw: 1,
                 status: 1,
                 amount: 1,
                 matureDate: 1,
@@ -117,6 +121,7 @@ const withdrawController = asyncHandler(async (req, res) => {
 
     // Update balance
     depositAccount.balance -= Number(amount);
+    depositAccount.totalWithdraw += Number(amount);
 
     // Create a new withdrawal
     const withdrawal = new Withdraw({

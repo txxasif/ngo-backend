@@ -47,6 +47,10 @@ const savingsAccountSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    totalWithdraw: {
+      type: Number,
+      default: 0,
+    },
     closingRequest: {
       type: Boolean,
       default: false,

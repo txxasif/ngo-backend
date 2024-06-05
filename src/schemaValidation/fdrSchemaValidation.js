@@ -14,7 +14,7 @@ const fdrAccountSchemaValidation = Joi.object({
         'any.required': 'Type is required',
         'any.only': 'Type must be either "flat" or "percentage"',
     }),
-    paymentTerm: Joi.string().valid('Monthly', 'Quarterly', 'Half-Yearly', 'Yearly').required().messages({
+    paymentTerm: Joi.string().valid('At a Time', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly').required().messages({
         'any.required': 'Payment Term is required',
         'any.only': 'Payment Term must be either "Monthly", "Quarterly", "Half-Yearly", or "Yearly"',
     }),
@@ -22,11 +22,6 @@ const fdrAccountSchemaValidation = Joi.object({
         'any.required': 'Period of Time in Months is required',
         'number.positive': 'Period of Time in Months must be a positive number',
         'number.integer': 'Period of Time in Months must be an integer',
-    }),
-    perInstallment: Joi.number().required().messages({
-        'any.required': 'Per Installment is required',
-        'number.positive': 'Per Installment must be a positive number',
-        'number.integer': 'Per Installment must be an integer',
     }),
     profitPercentage: Joi.number().positive().required().messages({
         'any.required': 'Profit Percentage is required',
@@ -41,10 +36,16 @@ const fdrAccountSchemaValidation = Joi.object({
     amount: Joi.number().required().messages({
         'any.required': 'Amount is required',
     }),
+    totalProfit: Joi.number().required().messages({
+        'any.required': 'Total Profit is required',
+    }),
+    totalInstallment: Joi.number().required().messages({
+        'any.required': 'Total Installment is required',
+    }),
     matureDate: Joi.date().required().messages({
         'any.required': 'Mature Date is required',
     }),
-    profitPerInstalment: Joi.number().required().messages({
+    profitPerInstallment: Joi.number().required().messages({
         'any.required': 'Profit Per Instalment is required',
     }),
     status: Joi.string().valid('pending', 'approved', 'closed').default('pending'),

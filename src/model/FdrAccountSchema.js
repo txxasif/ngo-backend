@@ -28,6 +28,7 @@ const fdrAccountSchema = new mongoose.Schema(
         paymentTerm: {
             type: String,
             enum: [
+                "At a Time",
                 "Monthly",
                 "Quarterly",
                 "Half-Yearly",
@@ -36,11 +37,6 @@ const fdrAccountSchema = new mongoose.Schema(
             required: true,
         },
         periodOfTimeInMonths: {
-            type: Number,
-            required: true,
-        },
-
-        perInstallment: {
             type: Number,
             required: true,
         },
@@ -64,7 +60,11 @@ const fdrAccountSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
-        profitPerInstalment: {
+        profitPerInstallment: {
+            type: Number,
+            required: true,
+        },
+        totalInstallment: {
             type: Number,
             required: true,
         },
@@ -72,7 +72,7 @@ const fdrAccountSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        totalDeposit: {
+        totalWithdraw: {
             type: Number,
             default: 0,
         },

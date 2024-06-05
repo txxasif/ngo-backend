@@ -33,41 +33,32 @@ const dpsAccountSchema = new mongoose.Schema(
             required: true,
         },
 
-        perInstallment: {
-            type: Number,
-            required: true,
-        },
+
         profitPercentage: {
             type: Number,
             required: true,
         },
-        onMatureAmount: {
-            type: Number,
-            required: true,
-        },
+
         openingDate: {
             type: Date,
-            required: true,
-        },
-        amount: {
-            type: Number,
             required: true,
         },
         matureDate: {
             type: Date,
             required: true,
         },
-        profitPerInstalment: {
-            type: Number,
-            required: true,
-        },
+
         balance: {
             type: Number,
             default: 0,
         },
-        balanceWithProfit: {
+        totalWithdraw: {
             type: Number,
-            default: 0,
+            default: 0
+        },
+        totalDeposit: {
+            type: Number,
+            default: 0
         },
         closingRequest: {
             type: Boolean,

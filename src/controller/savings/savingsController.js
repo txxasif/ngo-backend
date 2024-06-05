@@ -107,6 +107,7 @@ const withdrawController = asyncHandler(async (req, res) => {
 
     // Update balance
     depositAccount.balance -= Number(amount);
+    depositAccount.totalWithdraw += Number(amount);
 
     // Create a new withdrawal
     const withdrawal = new Withdraw({
