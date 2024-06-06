@@ -10,6 +10,7 @@ const Samity = require("../../model/SamitySchema");
 const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaValidation");
 const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
+const moment = require("moment");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -223,13 +224,30 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
 });
 const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
-  console.log(loanBody);
   const { error } = ngoLoanSchemaValidation.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  const newLoanAccount = new NgoLoan(loanBody);
-  await newLoanAccount.save();
+  const { durationInMonth, perInstallment, date } = loanBody;
+  const tDate = date;
+  delete loanBody.date;
+  const newLoanAccount = await NgoLoan.create(loanBody);
+  let transaction = {
+    ngoLoanId: newLoanAccount._id,
+    amount: perInstallment,
+    date: null,
+    status: 'unpaid'
+  };
+  let transactions = [];
+  let startDate = moment(tDate);
+  for (let i = 1; i <= durationInMonth; i++) { // Start from 1 to add 1 month for the first transaction
+    let newTransaction = { ...transaction };
+    newTransaction.date = startDate.clone().add(i, 'months').toISOString();
+    transactions.push(newTransaction);
+  }
+  console.log(transactions.length);
+  await NgoLoanTransaction.insertMany(transactions);
+
   return res.json({ message: " done" });
 });
 const ngoLoanPayListController = asyncHandler(async (req, res) => {
@@ -248,14 +266,15 @@ const ngoLoanPayListController = asyncHandler(async (req, res) => {
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
   console.log(body);
-  const { ngoLoanId, amount, date } = body;
-  if (!ngoLoanId || !amount || !date) {
+  const { ngoLoanId, transactionId, amount, status } = body;
+  if (!ngoLoanId || !transactionId) {
     return res.status(404).json({ message: "All fields are required" });
   }
   const ngoLoanAccount = await NgoLoan.findOne({ _id: ngoLoanId });
   ngoLoanAccount.totalPaid += amount;
   await ngoLoanAccount.save();
-  const newTransaction = new NgoLoanTransaction(body);
+  const newTransaction = await NgoLoanTransaction.findOne({ _id: transactionId });
+  newTransaction.status = status;
   await newTransaction.save();
   return res.json({ message: "Payment Done" });
 });

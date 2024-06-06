@@ -5,6 +5,10 @@ const ngoLoanSchemaValidation = Joi.object({
     "any.required": "Institute is required.",
     "string.empty": "Institute cannot be empty.",
   }),
+  date: Joi.date().required().messages({
+    "any.required": "Opening date is required.",
+    "date.base": "Opening date must be a valid date.",
+  }),
   nameOfInstitute: Joi.string().required().messages({
     "any.required": "Name of Institute is required.",
     "string.empty": "Name of Institute cannot be empty.",
