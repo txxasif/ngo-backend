@@ -1,5 +1,41 @@
 const mongoose = require("mongoose");
 
+const nidDetailsSchema = new mongoose.Schema({
+  nidNumber: String,
+  nidPhotoFront: String, // URL to the front photo of the NID
+  nidPhotoBack: String   // URL to the back photo of the NID
+});
+
+const birthCertificateSchema = new mongoose.Schema({
+  birthCertificateNumber: String,
+  photo: String // URL to the photo of the birth certificate
+});
+
+const nomineeSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  relation: {
+    type: String,
+    required: true,
+  },
+  share: {
+    type: Number,
+    min: 0,
+    max: 100,
+  },
+  occupation: String,
+  phoneNumber: String,
+  photo: String, // URL to the nominee's photo
+  birthCertificate: birthCertificateSchema,
+  nidDetails: nidDetailsSchema
+});
+
 const memberSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -15,86 +51,46 @@ const memberSchema = new mongoose.Schema({
     ref: "Samity",
     required: true,
   },
-
-  fathersName: {
-    type: String,
-  },
-  mothersName: {
-    type: String,
-  },
-  spouseName: {
-    type: String,
-  },
-  occupation: {
-    type: String,
-  },
-  occupationBrief: {
-    type: String,
-  },
+  fathersName: String,
+  mothersName: String,
+  spouseName: String,
+  occupation: String,
+  occupationBrief: String,
   presentAddress: {
     type: String,
     required: true,
   },
-  permanentAddress: {
-    type: String,
-  },
-  educationalQualification: {
-    type: String,
-  },
-  dateOfBirth: {
-    type: Date,
-  },
+  permanentAddress: String,
+  educationalQualification: String,
+  dateOfBirth: Date,
   nidNumber: {
     type: String,
-    unique: true, // Ensures no duplicate NID numbers
+    unique: true,
   },
   mobileNumber: {
     type: String,
     required: true,
     index: true,
   },
-  emergencyContactNumber: {
-    type: String,
-  },
-  religion: {
-    type: String,
-  },
-  membershipFee: {
-    type: Number,
-  },
-  photo: {
-    type: String, // Path to the stored image or reference to the image data
-  },
+  emergencyContactNumber: String,
+  religion: String,
+  membershipFee: Number,
+  formFee: Number,
+  memberSalary: Number,
+  photo: String, // URL to the member's photo
   status: {
     type: String,
-    enum: ["pending", "accepted","rejected"],
+    enum: ["pending", "accepted", "rejected"],
   },
-  nominee: {
-    type: {
-      name: {
-        type: String,
-        required: true,
-      },
-      address: {
-        type: String,
-        required: true,
-      },
-      relation: {
-        type: String,
-        required: true,
-      },
-      share: {
-        type: Number,
-        min: 0,
-        max: 100,
-      },
-      occupation: {
-        type: String,
-      },
-    },
-  },
+  nidDetails: nidDetailsSchema,
+  birthCertificate: birthCertificateSchema,
+  nominee: nomineeSchema,
+  referenceSection: {
+    employeeName: String,
+    employeeNumber: String
+  }
 });
 
-const LocalUser =
-  mongoose.models.LocalUser || mongoose.model("LocalUser", memberSchema);
+const LocalUser = mongoose.models.LocalUser || mongoose.model("LocalUser", memberSchema);
+
 module.exports = LocalUser;
