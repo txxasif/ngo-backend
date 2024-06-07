@@ -125,10 +125,21 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
   if (payFineAmount > 0) {
     selectedLoanAccount.loanFinePaid += payFineAmount;
   }
+  console.log(selectedLoanAccount.paid);
+  const lastBalance = selectedLoanAccount.paid;
   selectedLoanAccount.paid += amount;
+  let newBody = body;
+  if (selectedLoanAccount.paid > selectedLoanAccount.loanAmount) {
+    const profit = selectedLoanAccount.paid - lastBalance;
+    newBody = {
+      ...body,
+      profit
+    }
+  }
   await selectedLoanAccount.save();
-  const newLoanTransaction = await LoanTransaction(body);
+  const newLoanTransaction = await LoanTransaction(newBody);
   await newLoanTransaction.save();
+  console.log(newLoanTransaction);
   res.json({ message: "done" });
 });
 
@@ -203,7 +214,7 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
     branchId: new mongoose.Types.ObjectId(branchId),
     samityId: new mongoose.Types.ObjectId(samityId),
   }).lean();
-  console.log(loanAccounts.length);
+
   let totalProfit = 0;
   for (let i = 0; i < loanAccounts.length; i++) {
     if (loanAccounts[i].paid > loanAccounts[i].loanAmount) {

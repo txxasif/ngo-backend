@@ -63,10 +63,7 @@ const memberSchema = new mongoose.Schema({
   permanentAddress: String,
   educationalQualification: String,
   dateOfBirth: Date,
-  nidNumber: {
-    type: String,
-    unique: true,
-  },
+  openingDate: Date,
   mobileNumber: {
     type: String,
     required: true,

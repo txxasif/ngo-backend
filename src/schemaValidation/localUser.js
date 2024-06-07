@@ -107,9 +107,7 @@ const localUserSchema = Joi.object({
   openingDate: Joi.date().allow(null, '').messages({
     'date.base': 'Date of birth must be a valid date'
   }),
-  nidNumber: Joi.string().allow(null, '').messages({
-    'string.base': 'NID number must be a string'
-  }),
+
   mobileNumber: Joi.string().required().messages({
     'any.required': 'Mobile number is required',
     'string.base': 'Mobile number must be a string'

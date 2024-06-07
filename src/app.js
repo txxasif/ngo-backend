@@ -24,6 +24,7 @@ const liabilitiesRoute = require("./routes/liabilitiesRoute");
 const savingsRoute = require("./routes/savingsRoute");
 const fdrRoute = require("./routes/fdrRoute");
 const dpsRoute = require("./routes/dpsRoute");
+const incomeRoute = require("./routes/incomeRoute");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -32,7 +33,7 @@ app.use(express.json());
 
 app.use("/admin", adminRoute);
 app.use("/auth", userAuthRoute);
-
+app.use("/income", incomeRoute);
 app.use("/branch", branchRoute);
 app.use("/samity", samityRoute);
 app.use("/localuser", localUserRoute);
