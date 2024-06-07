@@ -1,4 +1,29 @@
 const mongoose = require("mongoose");
+const transactionSchema = new mongoose.Schema(
+    {
+
+        accountId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "DepositAccount",
+            required: true,
+        },
+        date: {
+            type: Date,
+            required: true,
+        },
+        amount: {
+            type: Number,
+            required: true,
+        },
+        status: {
+            type: String,
+            enum: ['paid', 'unpaid'],
+        }
+    },
+    {
+        timestamps: true,
+    }
+);
 const fdrAccountSchema = new mongoose.Schema(
     {
         memberId: {
@@ -93,5 +118,7 @@ const fdrAccountSchema = new mongoose.Schema(
 const FdrAccount =
     mongoose.models.FdrAccount ||
     mongoose.model("FdrAccount", fdrAccountSchema);
-
-module.exports = { FdrAccount };
+const TransactionFdr =
+    mongoose.models.TransactionFdr ||
+    mongoose.model("TransactionFdr", transactionSchema);
+module.exports = { FdrAccount, TransactionFdr };

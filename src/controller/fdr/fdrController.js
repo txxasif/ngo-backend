@@ -1,12 +1,12 @@
 const asyncHandler = require("express-async-handler");
-const { FdrAccount } = require("../../model/FdrAccountSchema");
+const { FdrAccount, TransactionFdr } = require("../../model/FdrAccountSchema");
 const fdrAccountSchemaValidation = require("../../schemaValidation/fdrSchemaValidation");
 const mongoose = require("mongoose");
 const { Transaction, Withdraw } = require("../../model/DepositAccountSchema");
+const { generateTransactions } = require("../../helper/generateTransactions");
 
 const createFdrAccountController = asyncHandler(async (req, res) => {
     const fdrBody = req.body;
-    console.log(fdrBody);
     const { error } = fdrAccountSchemaValidation.validate(fdrBody);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -17,8 +17,12 @@ const createFdrAccountController = asyncHandler(async (req, res) => {
         ...fdrBody
     }
 
+
     const newFdrAccount = await FdrAccount.create(newBody);
-    if (!newFdrAccount) {
+    console.log(newFdrAccount);
+    const transactions = generateTransactions(fdrBody, newFdrAccount._id);
+    const newTransactions = await TransactionFdr.insertMany(transactions);
+    if (!newFdrAccount && !newTransactions) {
         return res.status(404).json({ message: "Something Went Wrong" });
     }
     return res
@@ -97,14 +101,10 @@ const makeDepositController = asyncHandler(async (req, res) => {
 
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
-    const { id, amount, date, description } = req.body;
+    const { id, amount, accountId, status } = req.body;
     console.log(req.body);
 
-    // Validate memberId and amount
-    if (!id || !amount || isNaN(amount) || amount <= 0 || !date) {
-        return res.status(400).json({ message: "Invalid memberId or amount" });
-    }
-
+    return res.json({ message: "done" })
     // Find the deposit account by memberId
     let depositAccount = await FdrAccount.findOne({ _id: id });
 
@@ -161,7 +161,7 @@ const withdrawDetailsController = asyncHandler(async (req, res) => {
 const transactionDetailsController = asyncHandler(async (req, res) => {
     const _id = req.params.id;
     const id = new mongoose.Types.ObjectId(_id);
-    const data = await Transaction.aggregate([{
+    const data = await TransactionFdr.aggregate([{
         $match: {
             accountId: id
         }
