@@ -101,12 +101,10 @@ const makeDepositController = asyncHandler(async (req, res) => {
 
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
-    const { id, amount, accountId, status } = req.body;
+    const { accountId, amount, transactionId } = req.body;
     console.log(req.body);
-
-    return res.json({ message: "done" })
     // Find the deposit account by memberId
-    let depositAccount = await FdrAccount.findOne({ _id: id });
+    let depositAccount = await FdrAccount.findOne({ _id: accountId });
 
     if (!depositAccount) {
         return res.status(404).json({ message: "Deposit account not found" });
@@ -124,15 +122,9 @@ const withdrawController = asyncHandler(async (req, res) => {
     depositAccount.totalWithdraw += Number(amount);
 
     // Create a new withdrawal
-    const withdrawal = new Withdraw({
-        accountId: id,
-        date,
-        description: description,
-        amount,
-    });
-
-    // Add the withdrawal to deposit account
-    await withdrawal.save();
+    const transaction = await TransactionFdr.findOne({ _id: transactionId });
+    transaction.status = "paid";
+    await transaction.save();
 
     // Save the updated deposit account
     await depositAccount.save();
@@ -165,11 +157,7 @@ const transactionDetailsController = asyncHandler(async (req, res) => {
         $match: {
             accountId: id
         }
-    }, {
-        $sort: {
-            date: -1
-        }
-    }])
+    },])
     return res.json({ data })
 });
 

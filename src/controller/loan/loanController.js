@@ -11,6 +11,7 @@ const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaVal
 const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
+const { SavingsAccount } = require("../../model/SavingAccountsScehma");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -107,7 +108,8 @@ const searchLoanAccountsTransactionsController = asyncHandler(
     });
 
     const memberId = loanAccountDetails.memberId;
-    const depositAccounts = await DepositAccount.find({ memberId: memberId }).select('balance _id').lean();
+
+    const depositAccounts = await SavingsAccount.find({ memberId: memberId }).select('balance _id').lean();
     return res.json({ data: { transactionDetails, loanAccountDetails, depositAccounts, isCloseAble } });
   }
 );
@@ -266,7 +268,7 @@ const ngoLoanPayListController = asyncHandler(async (req, res) => {
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
   console.log(body);
-  const { ngoLoanId, transactionId, amount, status } = body;
+  const { ngoLoanId, transactionId, amount } = body;
   if (!ngoLoanId || !transactionId) {
     return res.status(404).json({ message: "All fields are required" });
   }
@@ -274,7 +276,7 @@ const ngoLoanPayController = asyncHandler(async (req, res) => {
   ngoLoanAccount.totalPaid += amount;
   await ngoLoanAccount.save();
   const newTransaction = await NgoLoanTransaction.findOne({ _id: transactionId });
-  newTransaction.status = status;
+  newTransaction.status = "paid";
   await newTransaction.save();
   return res.json({ message: "Payment Done" });
 });

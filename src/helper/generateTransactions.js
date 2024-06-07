@@ -6,6 +6,8 @@ const generateTransactions = (fdrBody, loanId) => {
     openingDate,
     paymentTerm,
     profitPerInstallment,
+    matureDate,
+    amount
   } = fdrBody;
   let startDate = moment(openingDate);
   let incrementMonths = 0;
@@ -41,7 +43,12 @@ const generateTransactions = (fdrBody, loanId) => {
       status: "unpaid",
     });
   }
-
+  transactions.push({
+    accountId: loanId,
+    amount: amount,
+    date: matureDate,
+    status: "unpaid",
+  });
   return transactions;
 };
 
