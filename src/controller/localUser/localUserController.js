@@ -18,13 +18,13 @@ const addLocalUserController = asyncHandler(async (req, res) => {
   if (checkPhoneNumber) {
     return res.status(400).json({ message: "Phone number is already in use." });
   }
-  const checkNid = await LocalUser.findOne({
-    nidNumber: localUserBody.nidNumber,
-  });
+  // const checkNid = await LocalUser.findOne({
+  //   nidNumber: localUserBody.nidNumber,
+  // });
 
-  if (checkNid) {
-    return res.status(400).json({ message: "NID number is already in use." });
-  }
+  // if (checkNid) {
+  //   return res.status(400).json({ message: "NID number is already in use." });
+  // }
 
   const newLocalUser = new LocalUser(localUserBody);
   await newLocalUser.save();
@@ -121,8 +121,8 @@ const updateUserDetailsController = asyncHandler(async (req, res) => {
 const localUserPendingListController = asyncHandler(async (req, res) => {
   console.log('hit')
   const users = await LocalUser.aggregate([{
-    $match:{status: "pending"}
-  },{
+    $match: { status: "pending" }
+  }, {
     $lookup: {
       from: "branches",
       localField: "branchId",
@@ -139,11 +139,11 @@ const localUserPendingListController = asyncHandler(async (req, res) => {
     },
   },
   {
-    $unwind : "$branch"
+    $unwind: "$branch"
   }, {
-    $unwind : "$samity"
+    $unwind: "$samity"
   },
-   {
+  {
     $project: {
       _id: 1,
       name: 1,
@@ -152,7 +152,7 @@ const localUserPendingListController = asyncHandler(async (req, res) => {
       mobileNumber: 1
     },
   }])
-  console.log(users,'--------');
+  console.log(users, '--------');
   res.json({ data: users });
 });
 
@@ -160,29 +160,29 @@ const acceptUserRequestController = asyncHandler(async (req, res) => {
   const _id = req.params.id;
   const { status } = req.query;
   const id = new mongoose.Types.ObjectId(_id)
-  console.log(id,_id,status);
+  console.log(id, _id, status);
 
-  try{
+  try {
     if (status === "rejected") {
       try {
-        await LocalUser.findByIdAndDelete({_id:id});
+        await LocalUser.findByIdAndDelete({ _id: id });
         return res.json({ message: "User deleted successfully" });
       } catch (error) {
         console.error(error);
-       return  res.status(500).json({ message: "Error deleting user" });
+        return res.status(500).json({ message: "Error deleting user" });
       }
     } else {
 
-    
-     await LocalUser.findByIdAndUpdate(
+
+      await LocalUser.findByIdAndUpdate(
         { _id: id },
         { $set: { status: 'accepted' } }
       );
-     return  res.json({ message : "User accepted successfully" });
+      return res.json({ message: "User accepted successfully" });
     }
-  }catch(error){
+  } catch (error) {
     console.error(error);
-    return  res.status(500).json({ message: "Error updating user" });
+    return res.status(500).json({ message: "Error updating user" });
   }
 });
 
