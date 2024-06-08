@@ -81,7 +81,7 @@ const incomeDayWiseController = asyncHandler(async (req, res) => {
     console.log(loanProfit[0]);
     console.log(incomeHeadTransaction[0]);
     console.log(memberProfit[0]);
-    return res.status(200).json({ data: incomeHeadTransaction });
+    return res.status(200).json({ data: { incomeHeadTransaction, loanProfit, memberProfit } });
 })
 module.exports = {
     createIncomeHeadController,
