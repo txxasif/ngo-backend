@@ -3,7 +3,6 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
-- [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
@@ -19,29 +18,7 @@ This audit-based software is designed to manage and track user loans, savings, F
 - **Access Control**: Role-based access for employees.
 - **Comprehensive Audit Trails**: Detailed logs and reports for all transactions and activities.
 
-## Installation
-1. **Clone the repository**:
-    ```sh
-    git clone https://github.com/yourusername/your-repo-name.git
-    cd your-repo-name
-    ```
 
-2. **Install dependencies**:
-    ```sh
-    npm install
-    ```
-
-3. **Set up the database**:
-    - Ensure you have the correct database settings in your environment configuration file (e.g., `.env`).
-    - Run the migration scripts to set up the database schema:
-    ```sh
-    npm run migrate
-    ```
-
-4. **Start the application**:
-    ```sh
-    npm start
-    ```
 
 ## Usage
 1. **Login**: Employees can log in using their credentials.
@@ -63,13 +40,4 @@ This audit-based software is designed to manage and track user loans, savings, F
 ### Employee Management
 ![Employee Management](https://ibb.co/KFpm485)
 
-## Contributing
-Contributions are welcome! Please follow these steps:
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a pull request.
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
