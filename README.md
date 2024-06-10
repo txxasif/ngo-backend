@@ -29,10 +29,10 @@ This audit-based software is designed to manage and track user loans, savings, F
 
 ## Screenshots
 ### Dashboard
-![Dashboard](https://ibb.co/W0Rdt72)
+![Dashboard]([https://ibb.co/W0Rdt72](https://i.ibb.co/dtH3gX5/Screenshot-2024-06-10-130726.png))
 
 ### User Loans and Savings
-![User Loans and Savings](https://ibb.co/1ZVGmk4)
+![User Loans and Savings]([https://ibb.co/1ZVGmk4](https://i.ibb.co/7vct1q0/Screenshot-2024-06-10-130424.png))
 
 ### Expense Tracking
 ![Expense Tracking](https://ibb.co/z7dSG02)
