@@ -29,15 +29,14 @@ This audit-based software is designed to manage and track user loans, savings, F
 
 ## Screenshots
 ### Dashboard
-![Dashboard](https://ibb.co/W0Rdt72](https://i.ibb.co/dtH3gX5/Screenshot-2024-06-10-130726.png))
 
-### User Loans and Savings
-![User Loans and Savings](https://ibb.co/1ZVGmk4](https://i.ibb.co/7vct1q0/Screenshot-2024-06-10-130424.png))
+![Screenshot 2024-06-10 130726](https://github.com/txxasif/ngo-backend/assets/54706529/75ac4265-9454-4733-8d4c-f82961eb10a5)
 
-### Expense Tracking
-![Expense Tracking](https://ibb.co/z7dSG02)
+![Screenshot 2024-06-10 130617](https://github.com/txxasif/ngo-backend/assets/54706529/92616840-b61d-43e5-bf49-623fadea930b)
+![Screenshot 2024-06-10 130541](https://github.com/txxasif/ngo-backend/assets/54706529/72474813-bd61-46a6-bd7d-e53dfc1bbcd3)
+![Screenshot 2024-06-10 130527](https://github.com/txxasif/ngo-backend/assets/54706529/103be9cf-2675-4e0b-a25d-bd05cca7ec4f)
 
-### Employee Management
-![Employee Management](https://ibb.co/KFpm485)
+
+
 
 
