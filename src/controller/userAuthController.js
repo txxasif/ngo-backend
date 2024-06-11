@@ -28,7 +28,7 @@ const loginHandler = asyncHandler(async (req, res) => {
       process.env.ADMIN_REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
-    return res.json({id:foundUser._id, type: "admin", accessToken, refreshToken });
+    return res.json({ id: foundUser._id, phone: foundUser.phoneNumber, name: foundUser.name, type: "admin", accessToken, refreshToken });
   } else if (type === "collector") {
     const foundUser = await Employee.findOne({ mobileNumber: phoneNumber });
     if (!foundUser) {
@@ -48,7 +48,7 @@ const loginHandler = asyncHandler(async (req, res) => {
       process.env.COLLECTOR_REFRESH_TOKEN_SECRET,
       { expiresIn: "10s" }
     );
-    return res.json({id: foundUser._id, type: "collector", accessToken, refreshToken });
+    return res.json({ id: foundUser._id, phone: foundUser.mobileNumber, name: foundUser.name, type: "collector", accessToken, refreshToken });
   }
 });
 const refreshAccessTokenController = asyncHandler(async (req, res) => {

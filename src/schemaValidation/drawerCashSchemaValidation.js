@@ -13,18 +13,30 @@ const drawerCashValidationSchema = Joi.object({
     "any.required": "Samity ID is required",
     "string.base": "Samity ID must be a string",
   }),
-  date: Joi.date().required().messages({
-    "any.required": "Date is required",
-    "date.base": "Date must be a valid date",
-  }),
-  sourceDetails: Joi.string().required().messages({
-    "any.required": "Source details are required",
-    "string.base": "Source details must be a string",
-  }),
-  remarks: Joi.string().required().messages({
-    "any.required": "Remarks are required",
-    "string.base": "Remarks must be a string",
-  }),
+  transactionDetails: Joi.object({
+    date: Joi.date().required().messages({
+      "any.required": "Date is required",
+      "date.base": "Date must be a valid date",
+    }),
+    sourceDetails: Joi.string().required().messages({
+      "any.required": "Source details are required",
+      "string.base": "Source details must be a string",
+    }),
+    by: Joi.object({
+      name: Joi.string().required().messages({
+        "any.required": "Name is required",
+        "string.base": "Name must be a string",
+      }),
+      phone: Joi.string().required().messages({
+        "any.required": "Phone is required",
+        "string.base": "Phone must be a string",
+      }),
+      type: Joi.string().required().messages({
+        "any.required": "Type is required",
+        "string.base": "Type must be a string",
+      }),
+    }).required(),
+  }).required(),
   type: Joi.string().valid("cashIn", "cashOut").default("cashIn").messages({
     "any.only": 'Type must be either "cashIn" or "cashOut"',
     "string.base": "Type must be a string",

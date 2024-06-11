@@ -1,9 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const Bank = require("../../model/BankSchema");
-const BankCash = require("../../model/BankCashSchema");
 const Samity = require("../../model/SamitySchema");
+const BankCash = require("../../model/BankCashCash");
 const bankCashValidationSchema = require("../../schemaValidation/bankCashSchemaValidation");
-
 const addBankController = asyncHandler(async (req, res) => {
   const body = req.body;
   const { name } = body;
@@ -26,33 +25,38 @@ const getAllBankController = asyncHandler(async (req, res) => {
   const allBank = await Bank.find({});
   return res.status(200).json({ data: allBank });
 });
-
 const addBankTransactionController = asyncHandler(async (req, res) => {
   const bankCashBody = req.body;
   const { error } = bankCashValidationSchema.validate(bankCashBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  const { type, branchId, samityId, amount } = bankCashBody;
-
-  const selectedSamity = await Samity.findOne({
-    _id: samityId,
-    branchId: branchId,
+  const { bankId, amount, type } = bankCashBody;
+  const selectedBank = await Bank.findOne({
+    _id: bankId
   });
+  console.log(bankCashBody);
+  console.log(selectedBank);
   if (type === "cashIn") {
-    selectedSamity.drawerCash -= Number(amount);
-    selectedSamity.bankCash += Number(amount);
+
+    selectedBank.balance += Number(amount);
   } else {
-    selectedSamity.drawerCash += Number(amount);
-    selectedSamity.bankCash -= Number(amount);
+
+    selectedBank.balance -= Number(amount);
   }
 
   const newBankCash = new BankCash(bankCashBody);
-  await newBankCash.save();
+
+  const promiser = await Promise.all([newBankCash.save(), selectedBank.save()]);
   return res.json({ message: "done" });
 });
+const allBankCashDetailsController = asyncHandler(async (req, res) => {
+  const data = await Bank.find({}).lean();
+  return res.json({ data: data });
+})
 module.exports = {
   addBankController,
   getAllBankController,
   addBankTransactionController,
+  allBankCashDetailsController
 };

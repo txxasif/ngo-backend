@@ -16,21 +16,34 @@ const drawerCashSchema = new mongoose.Schema(
       ref: "Samity",
       required: true,
     },
-    date: {
-      type: Date,
-      required: true,
-    },
-    sourceDetails: {
-      type: String,
-      required: true,
-    },
-    remarks: {
-      type: String,
-      required: true,
+    transactionDetails: {
+      date: {
+        type: Date,
+        required: true,
+      },
+      sourceDetails: {
+        type: String,
+        required: true,
+      },
+      by: {
+        name: {
+          type: String,
+          required: true,
+        },
+        phone: {
+          type: String,
+          required: true,
+        },
+        type: {
+          type: String,
+          required: true,
+        },
+      },
     },
     type: {
       type: String,
       enum: ["cashIn", "cashOut"],
+      default: "cashIn",
     },
   },
   { timestamps: true }

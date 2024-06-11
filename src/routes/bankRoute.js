@@ -3,13 +3,15 @@ const {
   addBankController,
   getAllBankController,
   addBankTransactionController,
+  allBankCashDetailsController
 } = require("../controller/bank/bankController");
 const bankRoute = express.Router();
 
 bankRoute.post("/add", addBankController);
+bankRoute.get("/cash/all", allBankCashDetailsController);
 bankRoute.get("/all", getAllBankController);
 bankRoute.post(
-  "/from_drawer_to_bank/transaction",
+  "/money-add",
   addBankTransactionController
 );
 
