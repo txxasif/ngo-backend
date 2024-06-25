@@ -35,8 +35,6 @@ const addBankTransactionController = asyncHandler(async (req, res) => {
   const selectedBank = await Bank.findOne({
     _id: bankId
   });
-  console.log(bankCashBody);
-  console.log(selectedBank);
   if (type === "cashIn") {
 
     selectedBank.balance += Number(amount);
@@ -53,10 +51,18 @@ const addBankTransactionController = asyncHandler(async (req, res) => {
 const allBankCashDetailsController = asyncHandler(async (req, res) => {
   const data = await Bank.find({}).lean();
   return res.json({ data: data });
+});
+const getSpecificDetailsByBankIdController = asyncHandler(async (req, res) => {
+  const bankId = req.params.id;
+  const data = await BankCash.find({ bankId }).lean();
+  return res.json({ data: data });
 })
+
 module.exports = {
   addBankController,
   getAllBankController,
   addBankTransactionController,
-  allBankCashDetailsController
+  allBankCashDetailsController,
+  getSpecificDetailsByBankIdController
+
 };

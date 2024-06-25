@@ -12,24 +12,25 @@ const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
+const { loanDrawerBankCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
+  let payFrom = loanBody.payFrom;
+  let openedBy = loanBody.openedBy;
+  let loanAmount = loanBody.loanAmount;
+  let branchId = loanBody.branchId;
+  let openingDate = loanBody.openingDate;
+  delete loanBody.payFrom;
+  delete loanBody.openedBy;
   const { error } = loanAccountValidationSchema.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-
-  const { memberId } = loanBody;
-  // const isAlreadyExist = await LoanAccount.findOne({ memberId: memberId });
-  // if (isAlreadyExist) {
-  //   return res.status(404).json({ message: "Loan account already exists" });
-  // }
   const newLoanAccount = await LoanAccount.create(loanBody);
-  const samity = await Samity.findOne({ _id: loanBody.samityId });
-  samity.loanInField += Number(loanBody.loanAmount);
-  await samity.save();
+  await loanDrawerBankCashHelper(payFrom, openedBy, loanAmount, branchId, openingDate);
+
   if (!newLoanAccount) {
     return res.status(404).json({ message: "Something Went Wrong" });
   }

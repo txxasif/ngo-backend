@@ -3,7 +3,8 @@ const {
   addBankController,
   getAllBankController,
   addBankTransactionController,
-  allBankCashDetailsController
+  allBankCashDetailsController,
+  getSpecificDetailsByBankIdController
 } = require("../controller/bank/bankController");
 const bankRoute = express.Router();
 
@@ -14,5 +15,6 @@ bankRoute.post(
   "/money-add",
   addBankTransactionController
 );
+bankRoute.get("/bank/:id", getSpecificDetailsByBankIdController);
 
 module.exports = bankRoute;
