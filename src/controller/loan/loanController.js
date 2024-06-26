@@ -12,7 +12,7 @@ const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
-const { loanDrawerBankCashHelper } = require("../../helper/laonDrawerBankCashHelper");
+const { loanDrawerBankCashHelper, loanReceiverBankCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -117,8 +117,10 @@ const searchLoanAccountsTransactionsController = asyncHandler(
 
 const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
-  console.log(body);
-  const { loanId, amount, addFineAmount, payFineAmount } = body;
+  const { loanId, amount, addFineAmount, payFineAmount, date, by } = body;
+
+  let payFrom = body.payFrom;
+  delete body.payFrom;
   const selectedLoanAccount = await LoanAccount.findOne({ _id: loanId });
   if (addFineAmount > 0) {
     selectedLoanAccount.loanFine += addFineAmount;
@@ -126,7 +128,6 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
   if (payFineAmount > 0) {
     selectedLoanAccount.loanFinePaid += payFineAmount;
   }
-  console.log(selectedLoanAccount.paid);
   const lastBalance = selectedLoanAccount.paid;
   selectedLoanAccount.paid += amount;
   let newBody = body;
@@ -137,10 +138,9 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
       profit
     }
   }
-  await selectedLoanAccount.save();
-  const newLoanTransaction = await LoanTransaction(newBody);
-  await newLoanTransaction.save();
-  console.log(newLoanTransaction);
+  const newLoanTransaction = new LoanTransaction(newBody);
+  await Promise.all([selectedLoanAccount.save(), newLoanTransaction.save(),
+  loanReceiverBankCashHelper(payFrom, by, amount, date)]);
   res.json({ message: "done" });
 });
 

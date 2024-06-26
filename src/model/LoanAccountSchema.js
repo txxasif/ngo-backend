@@ -26,7 +26,24 @@ const transactionSchema = new mongoose.Schema(
     profit: {
       type: Number,
       default: 0,
-    }
+    },
+    date: {
+      type: Date
+    },
+    by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
   },
   {
     timestamps: true,
