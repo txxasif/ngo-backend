@@ -61,6 +61,20 @@ const loanAccountValidationSchema = Joi.object({
     "any.required": "Opening date is required.",
     "date.base": "Opening date must be a valid date.",
   }),
+  openedBy: Joi.object({
+    name: Joi.string().required().messages({
+      "any.required": "Name is required.",
+    }),
+    phone: Joi.string().required().messages({
+      "any.required": "Phone is required.",
+    }),
+    type: Joi.string().required().messages({
+      "any.required": "Type is required.",
+    }),
+  }).required().messages({
+    "object.unknown": "Field {{#label}} is not allowed.",
+    "any.custom": "{{#label}} is invalid.",
+  }),
   periodOfTimeInMonths: Joi.number().required().messages({
     "any.required": "Period of time in months is required.",
     "number.base": "Period of time in months must be a number.",

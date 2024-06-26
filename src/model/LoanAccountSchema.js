@@ -124,6 +124,20 @@ const loanAccountSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    openedBy: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
     status: {
       type: String,
       enum: ['pending', 'approved', 'closed']

@@ -1,5 +1,75 @@
 const mongoose = require("mongoose");
+const transactionSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DepositAccount",
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    }, by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+const withdrawSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DepositAccount",
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String
+    }, by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
 
+
+  },
+  {
+    timestamps: true,
+  }
+);
 const savingsAccountSchema = new mongoose.Schema(
   {
     memberId: {
@@ -55,27 +125,28 @@ const savingsAccountSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    profit: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       enum: ['pending', 'approved', 'closed']
     },
     openedBy: {
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-
-        refPath: 'openedByRef'
+      name: {
+        type: String,
+        required: true,
       },
-      role: {
+      phone: {
         type: String,
-        enum: ['admin', 'collector'],
-      }
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
     },
-    openedByRef: {
-      _id: {
-        type: String,
-        enum: ['admin', 'collector'],
-      }
-    }
 
   },
   {
@@ -86,5 +157,12 @@ const savingsAccountSchema = new mongoose.Schema(
 const SavingsAccount =
   mongoose.models.SavingsAccount ||
   mongoose.model("SavingsAccount", savingsAccountSchema);
-
-module.exports = { SavingsAccount };
+const SavingsAccountTransaction =
+  mongoose.models.SavingsAccountTransaction ||
+  mongoose.model("SavingsAccountTransaction", transactionSchema);
+const SavingsAccountWithdraw =
+  mongoose.models.SavingsAccountWithdraw || mongoose.model("SavingsAccountWithdraw", withdrawSchema);
+module.exports = {
+  SavingsAccount,
+  SavingsAccountTransaction, SavingsAccountWithdraw
+};

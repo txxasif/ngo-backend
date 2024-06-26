@@ -23,7 +23,6 @@ const createNewLoanAccountController = asyncHandler(async (req, res) => {
   let branchId = loanBody.branchId;
   let openingDate = loanBody.openingDate;
   delete loanBody.payFrom;
-  delete loanBody.openedBy;
   const { error } = loanAccountValidationSchema.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
