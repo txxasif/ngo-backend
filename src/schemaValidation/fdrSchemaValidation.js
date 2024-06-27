@@ -14,6 +14,20 @@ const fdrAccountSchemaValidation = Joi.object({
         'any.required': 'Type is required',
         'any.only': 'Type must be either "flat" or "percentage"',
     }),
+    openedBy: Joi.object({
+        name: Joi.string().required().messages({
+            "any.required": "Name is required.",
+        }),
+        phone: Joi.string().required().messages({
+            "any.required": "Phone is required.",
+        }),
+        type: Joi.string().required().messages({
+            "any.required": "Type is required.",
+        }),
+    }).required().messages({
+        "object.unknown": "Field {{#label}} is not allowed.",
+        "any.custom": "{{#label}} is invalid.",
+    }),
     paymentTerm: Joi.string().valid('At a Time', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly').required().messages({
         'any.required': 'Payment Term is required',
         'any.only': 'Payment Term must be either "Monthly", "Quarterly", "Half-Yearly", or "Yearly"',

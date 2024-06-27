@@ -4,9 +4,15 @@ const fdrAccountSchemaValidation = require("../../schemaValidation/fdrSchemaVali
 const mongoose = require("mongoose");
 const { Transaction, Withdraw } = require("../../model/DepositAccountSchema");
 const { generateTransactions } = require("../../helper/generateTransactions");
+const { fdrAccountOpeningCashHelper, fdrAccountWithdrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 const createFdrAccountController = asyncHandler(async (req, res) => {
     const fdrBody = req.body;
+    const payFrom = fdrBody.payFrom;
+    const openedBy = fdrBody.openedBy;
+    const date = fdrBody.openingDate;
+    const amount = fdrBody.amount;
+    delete fdrBody.payFrom;
     const { error } = fdrAccountSchemaValidation.validate(fdrBody);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -19,9 +25,10 @@ const createFdrAccountController = asyncHandler(async (req, res) => {
 
 
     const newFdrAccount = await FdrAccount.create(newBody);
-    console.log(newFdrAccount);
     const transactions = generateTransactions(fdrBody, newFdrAccount._id);
     const newTransactions = await TransactionFdr.insertMany(transactions);
+
+    await fdrAccountOpeningCashHelper(payFrom, openedBy, amount, date);
     if (!newFdrAccount && !newTransactions) {
         return res.status(404).json({ message: "Something Went Wrong" });
     }
@@ -60,6 +67,7 @@ const getSpecificDetailsForFdrAccountController = asyncHandler(async (req, res) 
                 profitPercentage: 1,
                 openingDate: 1,
                 balance: 1,
+                samityId: 1,
                 totalWithdraw: 1,
                 status: 1,
                 amount: 1,
@@ -71,8 +79,7 @@ const getSpecificDetailsForFdrAccountController = asyncHandler(async (req, res) 
                 }
             }
         }
-    ])
-    console.log(data);
+    ]);
     return res.json({ data })
 });
 const makeDepositController = asyncHandler(async (req, res) => {
@@ -101,8 +108,14 @@ const makeDepositController = asyncHandler(async (req, res) => {
 
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
-    const { accountId, amount, transactionId } = req.body;
-    console.log(req.body);
+    const body = req.body;
+    const { accountId, amount, transactionId } = body;
+    const payFrom = body.payFrom;
+    const date = body.date;
+    const by = body.by;
+    delete body.payFrom;
+    delete body.date;
+    delete body.by;
     // Find the deposit account by memberId
     let depositAccount = await FdrAccount.findOne({ _id: accountId });
 
@@ -128,6 +141,8 @@ const withdrawController = asyncHandler(async (req, res) => {
 
     // Save the updated deposit account
     await depositAccount.save();
+
+    await fdrAccountWithdrawCashHelper(payFrom, by, amount, date);
 
     // Return success response
     return res

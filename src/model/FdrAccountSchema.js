@@ -18,7 +18,22 @@ const transactionSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ['paid', 'unpaid'],
-        }
+        },
+        by: {
+            name: {
+                type: String,
+
+            },
+            phone: {
+                type: String,
+
+            },
+            type: {
+                type: String,
+
+            },
+        },
+
     },
     {
         timestamps: true,
@@ -108,7 +123,21 @@ const fdrAccountSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ['pending', 'approved', 'closed']
-        }
+        },
+        openedBy: {
+            name: {
+                type: String,
+                required: true,
+            },
+            phone: {
+                type: String,
+                required: true,
+            },
+            type: {
+                type: String,
+                required: true,
+            },
+        },
     },
     {
         timestamps: true,
