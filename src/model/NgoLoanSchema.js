@@ -15,6 +15,19 @@ const ngoLoanTransactionSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
+
+  by: {
+    name: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    type: {
+      type: String,
+    },
+  },
+
   status: {
     type: String,
     enum: ["unpaid", "paid"],
@@ -30,6 +43,7 @@ const ngoLoanSchema = new mongoose.Schema(
       required: true,
       enum: ["organization", "bank", "another"],
     },
+
     nameOfInstitute: {
       type: String,
       required: true,

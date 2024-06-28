@@ -12,7 +12,7 @@ const { savingAccountDepositCashHelper, savingAccountWithDrawCashHelper } = requ
  */
 const createSavingsAccountController = asyncHandler(async (req, res) => {
     const savingsBody = req.body;
-    console.log(savingsBody); '='
+
 
     // Validate the request body
     const { error } = savingsAccountSchemaValidation.validate(savingsBody);
@@ -105,8 +105,8 @@ const makeDepositController = asyncHandler(async (req, res) => {
     depositAccount.profit += profit;
 
     // Create and save transaction record
-    const transaction = new SavingsAccountTransaction({ accountId: id, date, amount, description, by });
-    await Promise.all([transaction.save(), depositAccount.save(), savingAccountDepositCashHelper(payFrom, by, amount, date)]);
+    const transaction = new SavingsAccountTransaction({ accountId: id, date, amount, description, by, });
+    await Promise.all([transaction.save(), depositAccount.save(), savingAccountDepositCashHelper(payFrom, by, amount, date, 'Savings')]);
 
     return res.status(200).json({ message: "Deposit money saved successfully" });
 });
@@ -153,7 +153,7 @@ const withdrawController = asyncHandler(async (req, res) => {
         amount,
         by
     });
-    await Promise.all([withdrawal.save(), depositAccount.save(), savingAccountWithDrawCashHelper(payFrom, by, amount, date)]);
+    await Promise.all([withdrawal.save(), depositAccount.save(), savingAccountWithDrawCashHelper(payFrom, by, amount, date, 'Savings')]);
     return res
         .status(200)
         .json({ message: "Withdrawal successful", depositAccount });

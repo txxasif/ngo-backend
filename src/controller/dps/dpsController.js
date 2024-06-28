@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { DpsAccount, DpsAccountTransaction, DpsAccountWithdraw } = require("../../model/DpsAccountSchema");
 const mongoose = require("mongoose");
 const dpsAccountSchemaValidation = require("../../schemaValidation/dpsSchemaValidation");
+const { savingAccountDepositCashHelper, savingAccountWithDrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 const createDpsAccountController = asyncHandler(async (req, res) => {
     const dpsBody = req.body;
 
@@ -46,6 +47,7 @@ const getSpecificDetailsForDpsAccountController = asyncHandler(async (req, res) 
                 paymentTerm: 1,
                 periodOfTimeInMonths: 1,
                 profitPercentage: 1,
+                samityId: 1,
                 openingDate: 1,
                 balance: 1,
                 totalDeposit: 1,
@@ -64,9 +66,12 @@ const getSpecificDetailsForDpsAccountController = asyncHandler(async (req, res) 
     return res.json({ data })
 });
 const makeDepositController = asyncHandler(async (req, res) => {
-    const { date, amount, description, id } = req.body;
-    console.log(req.body);
-    if (!date || !amount || !id) {
+    const body = req.body;
+    const { date, amount, description, id } = body;
+    let payFrom = body.payFrom;
+    let by = body.by;
+    delete body.payFrom;
+    if (!date || !amount || !id || !payFrom || !by) {
         return res.status(404).json({ message: "All Fields are Required" });
     }
     const depositAccount = await DpsAccount.findOne({ _id: id });
@@ -76,26 +81,28 @@ const makeDepositController = asyncHandler(async (req, res) => {
     if (Number(amount) < 500) {
         return res.status(400).json({ message: "DPS Installment Amount should be greater than 500tk." });
     }
-    let profitPercentage = depositAccount.profitPercentage
-    let periodInMonths = depositAccount.periodOfTimeInMonths;
-    console.log(typeof periodInMonths, periodInMonths);
-    console.log({ profitPercentage, periodInMonths });
     let profit = ((amount * (depositAccount.profitPercentage / 100)) / 365) * (depositAccount.periodOfTimeInMonths * 30);
     let newBalance = profit + Number(amount) + depositAccount.balance;
-    console.log(newBalance, typeof newBalance);
+
 
     depositAccount.balance = newBalance.toFixed(2);
+    depositAccount.profit = profit;
     depositAccount.totalDeposit += Number(amount);
-    const transaction = new DpsAccountTransaction({ accountId: id, date, amount, description });
-    await transaction.save();
-    await depositAccount.save();
+    const transaction = new DpsAccountTransaction({ accountId: id, date, amount, description, by });
+    await Promise.all([
+        transaction.save(),
+        depositAccount.save(),
+        savingAccountDepositCashHelper(payFrom, by, amount, date, 'DPS')
+    ]);
     return res.status(200).json({ message: "Deposit money saved successfully" });
 });
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
-    const { id, amount, date, description } = req.body;
-    console.log(req.body);
-
+    const body = req.body;
+    const { id, amount, date, description } = body;
+    let payFrom = body.payFrom;
+    let by = body.by;
+    delete body.payFrom;
     // Validate memberId and amount
     if (!id || !amount || isNaN(amount) || amount <= 0 || !date) {
         return res.status(400).json({ message: "Invalid memberId or amount" });
@@ -126,13 +133,11 @@ const withdrawController = asyncHandler(async (req, res) => {
         date,
         description: description,
         amount,
+        by
     });
 
-    // Add the withdrawal to deposit account
-    await withdrawal.save();
-
-    // Save the updated deposit account
-    await depositAccount.save();
+    // Save withdrawal and deposit account
+    await Promise.all([withdrawal.save(), depositAccount.save(), savingAccountWithDrawCashHelper(payFrom, by, amount, date, 'DPS')]);
 
     // Return success response
     return res

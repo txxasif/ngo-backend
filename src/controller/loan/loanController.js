@@ -12,7 +12,7 @@ const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
-const { loanDrawerBankCashHelper, loanReceiverBankCashHelper } = require("../../helper/laonDrawerBankCashHelper");
+const { loanDrawerBankCashHelper, loanReceiverBankCashHelper, savingAccountWithDrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 // ! create new  loan account controller
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -279,6 +279,11 @@ const ngoLoanPayListController = asyncHandler(async (req, res) => {
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
   console.log(body);
+  let date = body.date;
+  let by = body.by;
+  let payFrom = body.payFrom;
+  delete body.date;
+  delete body.payFrom;
   const { ngoLoanId, transactionId, amount } = body;
   if (!ngoLoanId || !transactionId) {
     return res.status(404).json({ message: "All fields are required" });
@@ -288,7 +293,10 @@ const ngoLoanPayController = asyncHandler(async (req, res) => {
   await ngoLoanAccount.save();
   const newTransaction = await NgoLoanTransaction.findOne({ _id: transactionId });
   newTransaction.status = "paid";
+  newTransaction.by = by;
   await newTransaction.save();
+  console.log('hitt');
+  await savingAccountWithDrawCashHelper(payFrom, by, amount, date, "Ngo Loan");
   return res.json({ message: "Payment Done" });
 });
 const ngoLoanPaymentDetailsByLoanIdController = asyncHandler(

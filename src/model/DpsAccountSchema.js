@@ -111,7 +111,10 @@ const dpsAccountSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-
+        profit: {
+            type: Number,
+            default: 0
+        },
 
         profitPercentage: {
             type: Number,
