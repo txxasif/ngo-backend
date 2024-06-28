@@ -1,11 +1,10 @@
 const asyncHandler = require("express-async-handler");
-const { DpsAccount } = require("../../model/DpsAccountSchema");
+const { DpsAccount, DpsAccountTransaction, DpsAccountWithdraw } = require("../../model/DpsAccountSchema");
 const mongoose = require("mongoose");
 const dpsAccountSchemaValidation = require("../../schemaValidation/dpsSchemaValidation");
-const { Transaction, Withdraw } = require("../../model/DepositAccountSchema");
 const createDpsAccountController = asyncHandler(async (req, res) => {
     const dpsBody = req.body;
-    console.log(dpsBody, 'xx');
+
     const { error } = dpsAccountSchemaValidation.validate(dpsBody);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -87,7 +86,7 @@ const makeDepositController = asyncHandler(async (req, res) => {
 
     depositAccount.balance = newBalance.toFixed(2);
     depositAccount.totalDeposit += Number(amount);
-    const transaction = new Transaction({ accountId: id, date, amount, description });
+    const transaction = new DpsAccountTransaction({ accountId: id, date, amount, description });
     await transaction.save();
     await depositAccount.save();
     return res.status(200).json({ message: "Deposit money saved successfully" });
@@ -122,7 +121,7 @@ const withdrawController = asyncHandler(async (req, res) => {
     depositAccount.totalWithdraw += Number(amount);
 
     // Create a new withdrawal
-    const withdrawal = new Withdraw({
+    const withdrawal = new DpsAccountWithdraw({
         accountId: id,
         date,
         description: description,
@@ -143,7 +142,7 @@ const withdrawController = asyncHandler(async (req, res) => {
 const withdrawDetailsController = asyncHandler(async (req, res) => {
     const _id = req.params.id;
     const id = new mongoose.Types.ObjectId(_id);
-    const data = await Withdraw.aggregate([{
+    const data = await DpsAccountWithdraw.aggregate([{
         $match: {
             accountId: id
         }
@@ -158,7 +157,7 @@ const withdrawDetailsController = asyncHandler(async (req, res) => {
 const transactionDetailsController = asyncHandler(async (req, res) => {
     const _id = req.params.id;
     const id = new mongoose.Types.ObjectId(_id);
-    const data = await Transaction.aggregate([{
+    const data = await DpsAccountTransaction.aggregate([{
         $match: {
             accountId: id
         }

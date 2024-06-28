@@ -1,5 +1,71 @@
 const mongoose = require("mongoose");
+const transactionSchema = new mongoose.Schema({
+    accountId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DepositAccount",
+        required: true,
+    },
+    date: {
+        type: Date,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true,
+    },
+    by: {
+        name: {
+            type: String,
+            required: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
+        type: {
+            type: String,
+            required: true,
+        },
+    },
+}, {
+    timestamps: true,
+});
+const withdrawSchema = new mongoose.Schema({
+    accountId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DepositAccount",
+        required: true,
+    },
+    date: {
+        type: Date,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true,
+    },
+    description: {
+        type: String
+    },
+    by: {
+        name: {
+            type: String,
+            required: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
+        type: {
+            type: String,
+            required: true,
+        },
+    },
 
+
+}, {
+    timestamps: true,
+});
 const dpsAccountSchema = new mongoose.Schema(
     {
         memberId: {
@@ -17,7 +83,20 @@ const dpsAccountSchema = new mongoose.Schema(
             ref: "Samity",
             required: true,
         },
-
+        openedBy: {
+            name: {
+                type: String,
+                required: true,
+            },
+            phone: {
+                type: String,
+                required: true,
+            },
+            type: {
+                type: String,
+                required: true,
+            },
+        },
         paymentTerm: {
             type: String,
             enum: [
@@ -77,5 +156,10 @@ const dpsAccountSchema = new mongoose.Schema(
 const DpsAccount =
     mongoose.models.DpsAccount ||
     mongoose.model("DpsAccount", dpsAccountSchema);
+const DpsAccountTransaction =
+    mongoose.models.DpsAccountTransaction ||
+    mongoose.model("DpsAccountTransaction", transactionSchema);
+const DpsAccountWithdraw =
+    mongoose.models.DpsAccountWithdraw || mongoose.model("DpsAccountWithdraw", withdrawSchema);
 
-module.exports = { DpsAccount };
+module.exports = { DpsAccount, DpsAccountTransaction, DpsAccountWithdraw };
