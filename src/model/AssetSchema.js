@@ -12,12 +12,35 @@ const assetSchema = new mongoose.Schema(
       ref: "Samity",
       required: true,
     },
-    expenseName: {
-      type: String,
+    headId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AssetHead",
+      required: true,
     },
-    description: {
-      type: String,
+    by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
     },
+    appreciation: {
+      type: Number,
+      default: 0,
+    },
+    depreciation: {
+      type: Number,
+      default: 0,
+    },
+
+
     unitAmount: {
       type: Number,
     },
@@ -37,17 +60,10 @@ const assetSchema = new mongoose.Schema(
     vat: {
       type: Number,
     },
-    totalPayment: {
-      type: Number,
-    },
+
     total: {
       type: Number,
       default: 0,
-    },
-    status: {
-      type: String,
-      enum: ["paid", "unpaid"],
-      required: true,
     },
     remarks: {
       type: String,

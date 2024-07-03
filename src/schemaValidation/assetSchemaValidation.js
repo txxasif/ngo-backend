@@ -11,14 +11,34 @@ const assetValidationSchema = Joi.object({
     "string.hex": "Samity ID must be a hexadecimal value",
     "string.length": "Samity ID must be exactly 24 characters long",
   }),
-  expenseName: Joi.string().allow("").messages({
-    "string.base": "Expense name must be a string",
+  headId: Joi.string().hex().length(24).required().messages({
+    "any.required": "Head ID is required",
+    "string.hex": "Head ID must be a hexadecimal value",
+    "string.length": "Head ID must be exactly 24 characters long",
   }),
-  description: Joi.string().allow("").messages({
-    "string.base": "Description must be a string",
-  }),
+
   unitAmount: Joi.number().messages({
     "number.base": "Unit amount must be a number",
+  }),
+  appreciation: Joi.number().messages({
+    "number.base": "Appreciation Percentage must be a number",
+  }),
+  depreciation: Joi.number().messages({
+    "number.base": "Depreciation Percentage must be a number",
+  }),
+  by: Joi.object({
+    name: Joi.string().required().messages({
+      "any.required": "Name is required.",
+    }),
+    phone: Joi.string().required().messages({
+      "any.required": "Phone is required.",
+    }),
+    type: Joi.string().required().messages({
+      "any.required": "Type is required.",
+    }),
+  }).required().messages({
+    "object.unknown": "Field {{#label}} is not allowed.",
+    "any.custom": "{{#label}} is invalid.",
   }),
   unitPrice: Joi.number().messages({
     "number.base": "Unit price must be a number",
@@ -36,14 +56,10 @@ const assetValidationSchema = Joi.object({
   vat: Joi.number().messages({
     "number.base": "VAT must be a number",
   }),
-  totalPayment: Joi.number().messages({
+  total: Joi.number().messages({
     "number.base": "Total payment must be a number",
   }),
-  status: Joi.string().valid("paid", "unpaid").required().messages({
-    "any.required": "Status is required",
-    "string.base": "Status must be a string",
-    "any.only": 'Status must be either "paid" or "unpaid"',
-  }),
+
   remarks: Joi.string().allow("").messages({
     "string.base": "Remarks must be a string",
   }),
