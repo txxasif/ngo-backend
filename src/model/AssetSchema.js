@@ -3,63 +3,59 @@ const mongoose = require("mongoose");
 const assetSchema = new mongoose.Schema(
   {
     branchId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
       required: true,
     },
     samityId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Samity",
       required: true,
     },
-
-    type: {
+    expenseName: {
       type: String,
-      enum: ["fixed", "temporary"],
     },
-    productName: {
+    description: {
       type: String,
-      required: true,
     },
-    quantity: {
+    unitAmount: {
       type: Number,
-      required: true,
-      default: 0,
     },
     unitPrice: {
       type: Number,
-      required: true,
-      default: 0,
     },
-    depreciationPrice: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    total: {
+    tds: {
       type: Number,
     },
-
-    depreciation: { type: Number, default: 0 },
-    description: {
-      type: String,
-      required: true,
-    },
-    remarks: {
-      type: String,
-      required: true,
+    tax: {
+      type: Number,
     },
     date: {
       type: Date,
       required: true,
-      default: Date.now,
+    },
+    vat: {
+      type: Number,
+    },
+    totalPayment: {
+      type: Number,
+    },
+    total: {
+      type: Number,
+      default: 0,
+    },
+    status: {
+      type: String,
+      enum: ["paid", "unpaid"],
+      required: true,
+    },
+    remarks: {
+      type: String,
     },
   },
   { timestamps: true }
 );
 
-const Asset = mongoose.models.Asset || mongoose.model("Asset", assetSchema);
-
+const Asset =
+  mongoose.models.Asset || mongoose.model("Asset", assetSchema);
 module.exports = Asset;

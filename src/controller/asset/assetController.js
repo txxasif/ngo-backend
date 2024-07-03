@@ -1,24 +1,39 @@
 const asyncHandler = require("express-async-handler");
-const assetValidationSchema = require("../../schemaValidation/assetSchemaValidation");
+const AssetHead = require("../../model/AssetHeadSchema");
 const Asset = require("../../model/AssetSchema");
-const addAssetController = asyncHandler(async (req, res) => {
-  const assetBody = req.body;
-  console.log(assetBody);
-  const { error } = assetValidationSchema.validate(assetBody);
+const assetValidationSchema = require("../../schemaValidation/assetSchemaValidation");
+
+const createPurchaseExpenseController = asyncHandler(async (req, res) => {
+  const purchaseBody = req.body;
+
+  // Validate the request body against the purchase schema
+  const { error, value } = assetValidationSchema.validate(purchaseBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-  const asset = new Asset(assetBody);
-  await asset.save();
-  res.json({ message: "Done" });
+
+  // Create and save a new Purchase document
+  const newPurchases = new Asset(purchaseBody);
+  await newPurchases.save();
+
+  return res.send({ message: "Done" });
 });
 
-const getAllAssetsController = asyncHandler(async (req, res) => {
-  const { branchId, samityId } = req.query;
-  const asset = await Asset.find({ branchId, samityId });
-  return res.json({ data: asset });
+const createAssetHeaderController = asyncHandler(async (req, res) => {
+  const assetBody = req.body;
+  const newAssetHeader = new AssetHead(assetBody);
+  await newAssetHeader.save();
+  return res.send({ message: "Done" });
+
 });
+
+const getAssetHeadListController = asyncHandler(async (req, res) => {
+  const data = await AssetHead.find({}).lean();
+  return res.json({ data });
+})
+
 module.exports = {
-  addAssetController,
-  getAllAssetsController,
+  createAssetHeaderController,
+  getAssetHeadListController,
+
 };

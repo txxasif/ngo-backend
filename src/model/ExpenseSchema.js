@@ -11,34 +11,36 @@ const expenseSchema = new mongoose.Schema(
       ref: "Samity",
       required: true,
     },
+    headId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExpenseHead",
+      required: true,
+    },
+    by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
     date: {
       type: Date,
       required: true,
     },
-    officeRent: {
-      type: Number,
-      required: true,
-    },
-    salary: {
-      type: Number,
-      required: true,
-    },
-    stationaryAndPrinting: {
-      type: Number,
-      required: true,
-    },
-    taDaAllowances: {
-      type: Number,
-      required: true,
-    },
-    anyBill: {
-      type: Number,
-      required: true,
-    },
-    total: {
+
+    amount: {
       type: Number,
       default: 0,
+      required: true,
     },
+
     remarks: {
       type: String,
     },

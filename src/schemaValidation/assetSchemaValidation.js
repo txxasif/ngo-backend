@@ -1,53 +1,51 @@
 const Joi = require("joi");
 
 const assetValidationSchema = Joi.object({
-  branchId: Joi.string().required().messages({
-    "any.required": "Branch ID is required.",
-    "string.empty": "Branch ID cannot be empty.",
+  branchId: Joi.string().hex().length(24).required().messages({
+    "any.required": "Branch ID is required",
+    "string.hex": "Branch ID must be a hexadecimal value",
+    "string.length": "Branch ID must be exactly 24 characters long",
   }),
-  samityId: Joi.string().required().messages({
-    "any.required": "Samity ID is required.",
-    "string.empty": "Samity ID cannot be empty.",
+  samityId: Joi.string().hex().length(24).required().messages({
+    "any.required": "Samity ID is required",
+    "string.hex": "Samity ID must be a hexadecimal value",
+    "string.length": "Samity ID must be exactly 24 characters long",
   }),
-
-  type: Joi.string().valid("fixed", "temporary").messages({
-    "any.only": 'Type must be either "fixed" or "temporary".',
+  expenseName: Joi.string().allow("").messages({
+    "string.base": "Expense name must be a string",
   }),
-  productName: Joi.string().required().messages({
-    "any.required": "Product name is required.",
-    "string.empty": "Product name cannot be empty.",
+  description: Joi.string().allow("").messages({
+    "string.base": "Description must be a string",
   }),
-  depreciation: Joi.number().required().messages({
-    "any.required": "Depreciation is required.",
-    "number.base": "Depreciation must be a number.",
+  unitAmount: Joi.number().messages({
+    "number.base": "Unit amount must be a number",
   }),
-  quantity: Joi.number().required().messages({
-    "any.required": "Quantity is required.",
-    "number.base": "Quantity must be a number.",
+  unitPrice: Joi.number().messages({
+    "number.base": "Unit price must be a number",
   }),
-  unitPrice: Joi.number().required().messages({
-    "any.required": "Unit Price is required.",
-    "number.base": "Unit Price must be a number.",
+  tds: Joi.number().messages({
+    "number.base": "TDS must be a number",
   }),
-  depreciationPrice: Joi.number().required().messages({
-    "any.required": "Depreciation  Price is required.",
-    "number.base": "Depreciation Price must be a number.",
-  }),
-  amount: Joi.number().required().messages({
-    "any.required": "Amount is required.",
-    "number.base": "Amount must be a number.",
-  }),
-  description: Joi.string().required().messages({
-    "any.required": "Description is required.",
-    "string.empty": "Description cannot be empty.",
-  }),
-  remarks: Joi.string().required().messages({
-    "any.required": "Remarks is required.",
-    "string.empty": "Remarks cannot be empty.",
+  tax: Joi.number().messages({
+    "number.base": "Tax must be a number",
   }),
   date: Joi.date().required().messages({
-    "any.required": "Date is required.",
-    "date.base": "Date must be a valid date.",
+    "any.required": "Date is required",
+    "date.base": "Date must be a valid date",
+  }),
+  vat: Joi.number().messages({
+    "number.base": "VAT must be a number",
+  }),
+  totalPayment: Joi.number().messages({
+    "number.base": "Total payment must be a number",
+  }),
+  status: Joi.string().valid("paid", "unpaid").required().messages({
+    "any.required": "Status is required",
+    "string.base": "Status must be a string",
+    "any.only": 'Status must be either "paid" or "unpaid"',
+  }),
+  remarks: Joi.string().allow("").messages({
+    "string.base": "Remarks must be a string",
   }),
 });
 

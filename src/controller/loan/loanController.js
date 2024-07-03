@@ -14,7 +14,7 @@ const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
 const { loanDrawerBankCashHelper, loanReceiverBankCashHelper, savingAccountWithDrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
-// ! create new  loan account controller
+
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
   let payFrom = loanBody.payFrom;

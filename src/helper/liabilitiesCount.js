@@ -1,11 +1,10 @@
-const Asset = require("../model/AssetSchema");
+
 const { DepositAccount } = require("../model/DepositAccountSchema");
 const Employee = require("../model/EmployeeSchema");
 const Expense = require("../model/ExpenseSchema");
 const { LoanAccount } = require("../model/LoanAccountSchema");
 const LocalUser = require("../model/LocalUserSchema");
 const { NgoLoan } = require("../model/NgoLoanSchema");
-const Purchase = require("../model/purchaseSchema");
 const Samity = require("../model/SamitySchema");
 
 async function countProfit() {

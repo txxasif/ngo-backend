@@ -1,11 +1,10 @@
 const express = require("express");
 const {
-  addAssetController,
-  getAllAssetsController,
+  createAssetHeaderController, getAssetHeadListController
 } = require("../controller/asset/assetController");
 const assetRoute = express.Router();
 
-assetRoute.post("/add", addAssetController);
-assetRoute.get("/all", getAllAssetsController);
+assetRoute.post("/head/add", createAssetHeaderController);
+assetRoute.get("/head/all", getAssetHeadListController);
 
 module.exports = assetRoute;
