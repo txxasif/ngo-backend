@@ -60,6 +60,20 @@ const memberSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  openedBy: {
+    name: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
   permanentAddress: String,
   educationalQualification: String,
   dateOfBirth: Date,

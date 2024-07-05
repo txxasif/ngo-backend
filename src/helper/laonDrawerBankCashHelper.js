@@ -150,6 +150,7 @@ async function savingAccountDepositCashHelper(payFrom, by, amount, date, text) {
 }
 async function savingAccountWithDrawCashHelper(payFrom, by, amount, date, text) {
     const { _id, type } = payFrom;
+    console.log(amount, 'amount');
     console.log(text);
     console.log(payFrom);
     if (type === "drawer") {
@@ -362,5 +363,28 @@ async function assetWithdrawCashHelper(payFrom, by, amount, date) {
         await Promise.all([selectedBank.save(), newBankCash.save()]);
     }
 }
+async function localUserCashHelper(samityId, by, amount, date) {
 
-module.exports = { assetWithdrawCashHelper, expenseWithdrawCashHelper, fdrAccountWithdrawCashHelper, fdrAccountOpeningCashHelper, savingAccountWithDrawCashHelper, savingAccountDepositCashHelper, loanDrawerBankCashHelper, loanReceiverBankCashHelper }
+
+
+    // Handle drawer cash transaction
+    const samity = await Samity.findOne({ _id: samityId });
+    samity.drawerCash += Number(amount);
+
+    const drawerCashBody = {
+        amount: Number(amount),
+        branchId: samity.branchId,
+        samityId: samityId,
+        type: 'cashIn',
+        transactionDetails: {
+            date: date,
+            sourceDetails: `User Form Fee`,
+            by: by
+        }
+    }
+    const newDrawerCash = new DrawerCash(drawerCashBody);
+    await Promise.all([await samity.save(), await newDrawerCash.save()])
+
+}
+
+module.exports = { localUserCashHelper, assetWithdrawCashHelper, expenseWithdrawCashHelper, fdrAccountWithdrawCashHelper, fdrAccountOpeningCashHelper, savingAccountWithDrawCashHelper, savingAccountDepositCashHelper, loanDrawerBankCashHelper, loanReceiverBankCashHelper }

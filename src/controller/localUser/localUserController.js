@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const LocalUser = require("../../model/LocalUserSchema");
 const localUserSchema = require("../../schemaValidation/localUser");
 const mongoose = require("mongoose");
+const { localUserCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 // * add brunch controller
 const addLocalUserController = asyncHandler(async (req, res) => {
@@ -10,6 +11,9 @@ const addLocalUserController = asyncHandler(async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  const { openedBy, samityId, membershipFee, formFee, openingDate } = localUserBody;
+
+
 
   const checkPhoneNumber = await LocalUser.findOne({
     mobileNumber: localUserBody.mobileNumber,
@@ -18,16 +22,11 @@ const addLocalUserController = asyncHandler(async (req, res) => {
   if (checkPhoneNumber) {
     return res.status(400).json({ message: "Phone number is already in use." });
   }
-  // const checkNid = await LocalUser.findOne({
-  //   nidNumber: localUserBody.nidNumber,
-  // });
-
-  // if (checkNid) {
-  //   return res.status(400).json({ message: "NID number is already in use." });
-  // }
+  const amount = Number(membershipFee) + Number(formFee);
 
   const newLocalUser = new LocalUser(localUserBody);
-  await newLocalUser.save();
+  await Promise.all([newLocalUser.save(), localUserCashHelper(samityId, openedBy, amount, openingDate)])
+
   return res.json({ message: "User Create Successfully" }).status(200);
 });
 // * get user by phone number

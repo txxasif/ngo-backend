@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const nidDetailsSchema = Joi.object({
-  nidNumber: Joi.string().required().messages({
-    'string.base': 'NID number must be a string',
+  nidNumber: Joi.number().required().messages({
+    'string.base': 'NID number must be a number',
     'any.required': 'NID number is required'
   }),
   nidPhotoFront: Joi.string().uri().required().messages({
@@ -17,8 +17,8 @@ const nidDetailsSchema = Joi.object({
 });
 
 const birthCertificateSchema = Joi.object({
-  birthCertificateNumber: Joi.string().required().messages({
-    'string.base': 'Birth certificate number must be a string',
+  birthCertificateNumber: Joi.number().required().messages({
+    'string.base': 'Birth certificate number must be a number',
     'any.required': 'Birth certificate number is required'
   }),
   photo: Joi.string().uri().required().messages({
@@ -50,8 +50,8 @@ const nomineeSchema = Joi.object({
   occupation: Joi.string().allow(null, '').messages({
     'string.base': 'Nominee occupation must be a string',
   }),
-  phoneNumber: Joi.string().allow(null, '').messages({
-    'string.base': 'Nominee phone number must be a string',
+  phoneNumber: Joi.number().allow(null, '').messages({
+    'string.base': 'Nominee phone number must be a number',
   }),
   photo: Joi.string().uri().required().messages({
     'any.required': 'Nominee photo is required',
@@ -108,12 +108,12 @@ const localUserSchema = Joi.object({
     'date.base': 'Date of birth must be a valid date'
   }),
 
-  mobileNumber: Joi.string().required().messages({
+  mobileNumber: Joi.number().required().messages({
     'any.required': 'Mobile number is required',
-    'string.base': 'Mobile number must be a string'
+    'string.base': 'Mobile number must be a Number'
   }),
-  emergencyContactNumber: Joi.string().allow(null, '').messages({
-    'string.base': 'Emergency contact number must be a string'
+  emergencyContactNumber: Joi.number().allow(null, '').messages({
+    'string.base': 'Emergency contact number must be a Number'
   }),
   religion: Joi.string().allow(null, '').messages({
     'string.base': 'Religion must be a string'
@@ -134,6 +134,20 @@ const localUserSchema = Joi.object({
   status: Joi.string().valid("pending", "accepted", "rejected").messages({
     'any.only': 'Status must be one of "pending", "accepted", or "rejected"'
   }),
+  openedBy: Joi.object({
+    name: Joi.string().required().messages({
+      "any.required": "Name is required.",
+    }),
+    phone: Joi.string().required().messages({
+      "any.required": "Phone is required.",
+    }),
+    type: Joi.string().required().messages({
+      "any.required": "Type is required.",
+    }),
+  }).required().messages({
+    "object.unknown": "Field {{#label}} is not allowed.",
+    "any.custom": "{{#label}} is invalid.",
+  }),
   nidDetails: nidDetailsSchema,
   birthCertificate: birthCertificateSchema,
   nominee: nomineeSchema,
@@ -141,8 +155,8 @@ const localUserSchema = Joi.object({
     employeeName: Joi.string().allow(null, '').messages({
       'string.base': 'Employee name must be a string'
     }),
-    employeeNumber: Joi.string().allow(null, '').messages({
-      'string.base': 'Employee number must be a string'
+    employeeNumber: Joi.number().allow(null, '').messages({
+      'string.base': 'Employee number must be a number'
     })
   }).allow(null, '').messages({
     'object.base': 'Reference section must be an object'

@@ -119,10 +119,12 @@ const makeDepositController = asyncHandler(async (req, res) => {
  */
 const withdrawController = asyncHandler(async (req, res) => {
     const body = req.body;
+    console.log(req.body);
     const { id, amount, date, description } = body;
     let payFrom = body.payFrom;
     let by = body.by;
     delete body.payFrom;
+
 
     // Validate input
     if (!id || !amount || isNaN(amount) || amount <= 0 || !date) {
