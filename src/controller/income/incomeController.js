@@ -3,9 +3,12 @@ const IncomeHead = require("../../model/IncomeSchema");
 const IncomeHeadTransaction = require("../../model/IncomeHeadTransactionSchema");
 const { LoanTransaction } = require("../../model/LoanAccountSchema");
 const LocalUser = require("../../model/LocalUserSchema");
+
+const incomeHeadSchemaValidation = require("../../schemaValidation/incomeHeadValidation");
+const { incomeCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 const createIncomeHeadController = asyncHandler(async (req, res) => {
     const incomeHeadBody = req.body;
-    console.log(incomeHeadBody);
+
     const newIncomeHead = await IncomeHead.create(incomeHeadBody);
     if (!newIncomeHead) {
         return res.status(404).json({ message: "Something Went Wrong" });
@@ -20,15 +23,31 @@ const getAllIncomeHeadController = asyncHandler(async (req, res) => {
 });
 // create income head transaction
 const createIncomeHeadTransactionController = asyncHandler(async (req, res) => {
-    const incomeHeadTransactionBody = req.body;
-    console.log(incomeHeadTransactionBody);
-    const newIncomeHeadTransaction = await IncomeHeadTransaction.create(incomeHeadTransactionBody);
-    if (!newIncomeHeadTransaction) {
-        return res.status(404).json({ message: "Something Went Wrong" });
+    const { payFrom, ...incomeHeadData } = req.body;
+
+    const { error } = incomeHeadSchemaValidation.validate(incomeHeadData);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
     }
-    return res
-        .status(200)
-        .json({ message: "Income Head Transaction created successfully" });
+
+    const { date, amount, by } = incomeHeadData;
+
+    try {
+        const newIncomeHead = new IncomeHeadTransaction(incomeHeadData);
+
+        await Promise.all([
+            newIncomeHead.save(),
+            incomeCashHelper(payFrom, by, amount, date)
+        ]);
+
+        return res.status(201).json({
+            message: "Income Head created successfully",
+            data: newIncomeHead
+        });
+    } catch (err) {
+        console.error('Error creating Income Head:', err);
+        return res.status(500).json({ message: "Failed to create Income Head" });
+    }
 });
 const incomeDayWiseController = asyncHandler(async (req, res) => {
     const { date } = req.query;

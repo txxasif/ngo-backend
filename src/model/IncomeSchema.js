@@ -6,6 +6,20 @@ const incomeHeadTransactionSchema = new mongoose.Schema(
             ref: "IncomeHead",
             required: true,
         },
+        by: {
+            name: {
+                type: String,
+                required: true,
+            },
+            phone: {
+                type: String,
+                required: true,
+            },
+            type: {
+                type: String,
+                required: true,
+            },
+        },
         amount: {
             type: Number,
             required: true,

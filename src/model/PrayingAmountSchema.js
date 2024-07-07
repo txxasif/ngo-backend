@@ -5,6 +5,21 @@ const prayingAmountSchema = new mongoose.Schema({
     ref: "Employee",
     required: true,
   },
+  by: {
+    name: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
+
   reason: { type: String, required: true },
   totalAmount: { type: Number, required: true },
   adjustmentDuration: { type: Number, required: true },

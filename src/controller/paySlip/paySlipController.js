@@ -4,15 +4,19 @@ const PaySlip = require("../../model/PaySlipSchema");
 const Employee = require("../../model/EmployeeSchema");
 const moment = require("moment");
 const { default: mongoose } = require("mongoose");
+const { paySlipCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 
 const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
   const body = req.body;
 
-  const { due, employeeId,date: d } = body;
+  const { due, employeeId, date: d, by } = body;
   let date = moment(d);
-  let minusDate = date.subtract(1,'months');
-  body['date'] = minusDate;
+  let minusDate = date.subtract(1, 'months');
+  body['salaryMonthAndYear'] = new Date(minusDate);
+  const payFrom = body.payFrom;
+  const amount = body.totalPaid;
+  delete body.payFrom;
   const employee = await Employee.findOne({ _id: employeeId });
   employee.salaryDue = due;
   employee.leaveDays = 0;
@@ -34,6 +38,7 @@ const makeMonthlyPaySlipController = asyncHandler(async (req, res) => {
     await isEmployeeAppliedForPrayingAmount.save();
   }
   const newPaySlip = new PaySlip(body);
+  await paySlipCashHelper(payFrom, by, amount, d);
   await newPaySlip.save();
   res.json({ message: "Done" });
 });
@@ -44,17 +49,17 @@ const getEmployeePaySlipByYearAndMonthController = asyncHandler(
     if (isNaN(parsedDate)) {
       return res.status(400).json({ message: "Invalid date format" });
     }
-    if(!branchId || !samityId){
+    if (!branchId || !samityId) {
       return res.status(400).json({ message: "Invalid branch or samity id" });
     }
     const month = parsedDate.getMonth(); // Adjust to 1-12 range
     const year = parsedDate.getFullYear();
     const startDate = new Date(year, month, 1);
-    const endDate = new Date(year, month+1, 0);
+    const endDate = new Date(year, month + 1, 0);
     const paySlips = await PaySlip.aggregate([
       {
         $match: {
-          date: {
+          salaryMonthAndYear: {
             $gte: startDate,
             $lte: endDate,
           },

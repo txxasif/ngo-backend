@@ -20,8 +20,22 @@ const paySlipSchema = new mongoose.Schema(
       ref: "Samity",
       required: true,
     },
+    by: {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+    },
     basicSalary: { type: String, required: true },
-    mobileBill: { type: String, required: true},
+    mobileBill: { type: String, required: true },
     tourBill: { type: Number, default: 0 },
     overTime: { type: Number, default: 0 },
     specialAward: { type: Number, default: 0 },
@@ -29,7 +43,8 @@ const paySlipSchema = new mongoose.Schema(
     total: { type: Number, default: 0 },
     totalPaid: { type: Number, default: 0 },
     due: { type: Number, default: 0 },
-    date: {type: Date},
+    date: { type: Date },
+    salaryMonthAndYear: { type: Date },
     deduction: {
       advance: { type: Number, default: 0 },
       ait: { type: Number, default: 0 },
