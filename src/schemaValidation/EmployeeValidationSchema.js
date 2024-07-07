@@ -1,5 +1,20 @@
 const Joi = require("joi");
-
+const nidDetailsSchema = Joi.object({
+  nidNumber: Joi.number().required().messages({
+    'string.base': 'NID number must be a number',
+    'any.required': 'NID number is required'
+  }),
+  nidPhotoFront: Joi.string().uri().required().messages({
+    'string.uri': 'Front NID photo must be a valid URL',
+    'any.required': 'Front NID photo is required'
+  }),
+  nidPhotoBack: Joi.string().uri().required().messages({
+    'string.uri': 'Back NID photo must be a valid URL',
+    'any.required': 'Back NID photo is required'
+  })
+}).messages({
+  'object.base': 'NID details must be an object'
+});
 const employeeSchemaValidation = Joi.object({
   name: Joi.string().required().messages({
     "any.required": "Name is required.",
@@ -9,6 +24,7 @@ const employeeSchemaValidation = Joi.object({
     "any.required": "Father's name is required.",
     "string.base": "Father's name must be a string.",
   }),
+  nidDetails: nidDetailsSchema,
   motherName: Joi.string().required().messages({
     "any.required": "Mother's name is required.",
     "string.base": "Mother's name must be a string.",
@@ -43,10 +59,7 @@ const employeeSchemaValidation = Joi.object({
   religion: Joi.string().allow("").messages({
     "string.base": "Religion must be a string.",
   }),
-  nidNumber: Joi.string().required().messages({
-    "any.required": "NID number is required.",
-    "string.base": "NID number must be a string.",
-  }),
+
   photo: Joi.string().required().messages({
     "any.required": "Photo is required.",
     "string.base": "Photo must be a string.",
@@ -124,6 +137,7 @@ const employeeSchemaValidation = Joi.object({
       "any.required": "Present position details are required.",
     }),
   guarantorDetails: Joi.object({
+    nidDetails: nidDetailsSchema,
     name: Joi.string().required().messages({
       "any.required": "Guarantor's name is required.",
       "string.base": "Guarantor's name must be a string.",

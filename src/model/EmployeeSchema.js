@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-
+const nidDetailsSchema = new mongoose.Schema({
+  nidNumber: String,
+  nidPhotoFront: String, // URL to the front photo of the NID
+  nidPhotoBack: String   // URL to the back photo of the NID
+});
 const employeeSchema = new Schema({
   name: String,
   fatherName: String,
@@ -8,6 +12,7 @@ const employeeSchema = new Schema({
   presentAddress: String,
   permanentAddress: String,
   password: String,
+  nidDetails: nidDetailsSchema,
   branchId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Branch",
@@ -23,12 +28,11 @@ const employeeSchema = new Schema({
   mobileNumber: {
     type: Number,
     index: true,
-    
+
   },
   email: String,
   emergencyContactNumber: String,
   religion: String,
-  nidNumber: String,
   photo: String,
   previousOrganization: {
     name: String,
@@ -52,14 +56,15 @@ const employeeSchema = new Schema({
     default: 0,
   },
   leaveDays: {
-  type: Number,
-  default: 0,
+    type: Number,
+    default: 0,
   },
   guarantorDetails: {
     name: String,
     address: String,
     relation: String,
     occupation: String,
+    nidDetails: nidDetailsSchema
   },
 });
 

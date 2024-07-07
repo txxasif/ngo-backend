@@ -6,11 +6,15 @@ const Attendance = require("../../model/EmployeeAttendanceSchema");
 const PrayingAmount = require("../../model/PrayingAmountSchema");
 const countOfficeDays = require("../../helper/countOfficeDays");
 const LeaveApplication = require("../../model/leaveApplication");
+const { employeeSecurityFundCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 const createEmployeeController = asyncHandler(async (req, res) => {
   const employeeBody = req.body;
-  console.log(employeeBody);
   // Validate employee schema
+  const by = employeeBody.by;
+  const date = employeeBody.date;
+  delete employeeBody.date;
+  delete employeeBody.by;
   const { error } = employeeSchemaValidation.validate(employeeBody);
   console.log(error);
   if (error) {
@@ -30,9 +34,13 @@ const createEmployeeController = asyncHandler(async (req, res) => {
   if (existingMobile) {
     return res.status(400).json({ message: "Mobile number already exists" });
   }
+  const { samityId, presentPosition } = employeeBody;
+  const amount = presentPosition.employeeSecurityFund;
+
 
   // Create new employee
   const employee = new Employee(employeeBody);
+  await employeeSecurityFundCashHelper(samityId, by, amount, date);
   await employee.save();
   res.json({ message: "Done" });
 });
@@ -86,7 +94,7 @@ const searchEmployeeControllerForPaySlip = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "No employee found" });
   }
 
-  const { _id, branchId, samityId, presentPosition ,leaveDays} = employee;
+  const { _id, branchId, samityId, presentPosition, leaveDays } = employee;
   const salary = presentPosition.salaryAmount;
   const countDays = await countOfficeDays(branchId, samityId, date, _id);
   const { officeAttendanceCount, employeeAttendanceCount } = countDays;
@@ -106,7 +114,7 @@ const searchEmployeeControllerForPaySlip = asyncHandler(async (req, res) => {
 
   const data = {
     ...employee,
-    totalAbsent: absent < 0 ? 0: absent,
+    totalAbsent: absent < 0 ? 0 : absent,
     advance: adjustmentAmount,
   };
 
@@ -225,33 +233,33 @@ const getEmployeeByBranchAndSamityId = asyncHandler(async (req, res) => {
 
   res.json({ data: users });
 });
-const createEmployeeLeaveApplicationController = asyncHandler(async (req,res)=>{
+const createEmployeeLeaveApplicationController = asyncHandler(async (req, res) => {
   const body = req.body;
-  const newLeaveApplication  = new LeaveApplication({...body});
+  const newLeaveApplication = new LeaveApplication({ ...body });
   await newLeaveApplication.save();
   console.log(body);
-  return res.json({ message: "done"});
+  return res.json({ message: "done" });
 })
-const employeeLeaveApplicationListController = asyncHandler(async (req,res)=>{
+const employeeLeaveApplicationListController = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  const applications = await LeaveApplication.find({employeeId: id});
-  return res.json({data: applications})
+  const applications = await LeaveApplication.find({ employeeId: id });
+  return res.json({ data: applications })
 })
-const employeeLeaveApplicationPendingListController = asyncHandler(async (req,res)=>{
+const employeeLeaveApplicationPendingListController = asyncHandler(async (req, res) => {
   const applications = await LeaveApplication.aggregate([{
     $match: {
       status: "pending"
     }
-  },{
+  }, {
     $lookup: {
       from: "employees",
       localField: "employeeId",
       foreignField: "_id",
       as: "employee"
     }
-  },{
+  }, {
     $unwind: "$employee"
-  },{
+  }, {
     $lookup: {
       from: "branches",
       localField: "employee.branchId",
@@ -264,7 +272,7 @@ const employeeLeaveApplicationPendingListController = asyncHandler(async (req,re
       from: 'samities',
       localField: 'employee.samityId',
       foreignField: '_id',
-      as:'samity'
+      as: 'samity'
     }
   },
   {
@@ -275,31 +283,31 @@ const employeeLeaveApplicationPendingListController = asyncHandler(async (req,re
   },
   {
     $project: {
-      _id:1,
+      _id: 1,
       employeeName: "$employee.name",
       branchName: "$branch.branchName",
       samityName: "$samity.samityName",
       days: 1,
       reason: 1,
-      
+
     }
   }])
-  return res.json({data: applications})
+  return res.json({ data: applications })
 })
-const employeeLeaveApplicationAcceptOrRejectController = asyncHandler(async(req,res)=>{
-  const {id,status} = req.body;
-  await Employee.updateMany({},{$set:{leaveDays:0}})
+const employeeLeaveApplicationAcceptOrRejectController = asyncHandler(async (req, res) => {
+  const { id, status } = req.body;
+  await Employee.updateMany({}, { $set: { leaveDays: 0 } })
   const application = await LeaveApplication.findById(id);
-  if(status === "accepted"){
+  if (status === "accepted") {
     application.status = "accepted";
-    const  employee = await Employee.findById(application.employeeId);
+    const employee = await Employee.findById(application.employeeId);
     employee.leaveDays = application.days
     await employee.save();
-  }else{
+  } else {
     application.status = "rejected";
   }
   await application.save();
-  return res.json({message: "success"})
+  return res.json({ message: "success" })
 })
 module.exports = {
   createEmployeeController,
