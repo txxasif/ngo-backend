@@ -120,6 +120,7 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
 
   let payFrom = body.payFrom;
   delete body.payFrom;
+
   const selectedLoanAccount = await LoanAccount.findOne({ _id: loanId });
   if (addFineAmount > 0) {
     selectedLoanAccount.loanFine += addFineAmount;
@@ -127,19 +128,36 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
   if (payFineAmount > 0) {
     selectedLoanAccount.loanFinePaid += payFineAmount;
   }
+
   const lastBalance = selectedLoanAccount.paid;
-  selectedLoanAccount.paid += amount;
-  let newBody = body;
-  if (selectedLoanAccount.paid > selectedLoanAccount.loanAmount) {
-    const profit = selectedLoanAccount.paid - lastBalance;
-    newBody = {
-      ...body,
-      profit
+  const newBalance = lastBalance + amount;
+
+  let profit = 0;
+  if (newBalance > selectedLoanAccount.loanAmount) {
+    if (lastBalance < selectedLoanAccount.loanAmount) {
+      // This transaction crosses the loanAmount threshold
+      profit = newBalance - selectedLoanAccount.loanAmount;
+    } else {
+      // The entire transaction amount is profit
+      profit = amount;
     }
   }
+
+  selectedLoanAccount.paid = newBalance;
+
+  const newBody = {
+    ...body,
+    profit
+  };
+
   const newLoanTransaction = new LoanTransaction(newBody);
-  await Promise.all([selectedLoanAccount.save(), newLoanTransaction.save(),
-  loanReceiverBankCashHelper(payFrom, by, amount, date)]);
+
+  await Promise.all([
+    selectedLoanAccount.save(),
+    newLoanTransaction.save(),
+    loanReceiverBankCashHelper(payFrom, by, amount, date)
+  ]);
+
   res.json({ message: "done" });
 });
 
@@ -241,7 +259,6 @@ const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const by = loanBody.by;
   const amount = loanBody.totalAmount;
   delete loanBody.payFrom;
-
   const { error } = ngoLoanSchemaValidation.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });

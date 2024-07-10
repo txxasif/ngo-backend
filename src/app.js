@@ -26,6 +26,7 @@ const fdrRoute = require("./routes/fdrRoute");
 const dpsRoute = require("./routes/dpsRoute");
 const incomeRoute = require("./routes/incomeRoute");
 const DrawerCash = require("./model/DrawerCashSchema");
+const reportRoute = require("./routes/reportRoute");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -51,10 +52,11 @@ app.use("/praying-application", prayingAmountRoute);
 app.use("/pay-slip", paySlipRoute);
 app.use("/asset", assetRoute);
 app.use("/liabilities", liabilitiesRoute);
-app.get('/script', async (req, res) => {
-  await DrawerCash.updateMany({}, { $set: { isCapital: false } });
-  return res.json({ message: "done" });
-})
+app.use("/report", reportRoute);
+// app.get('/script', async (req, res) => {
+//   await DrawerCash.updateMany({}, { $set: { isCapital: false } });
+//   return res.json({ message: "done" });
+// })
 app.get("/api-docs", sitemap(app));
 app.all("*", (req, res) => {
   res.status(404);
