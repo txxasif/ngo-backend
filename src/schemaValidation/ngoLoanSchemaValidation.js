@@ -19,6 +19,23 @@ const ngoLoanSchemaValidation = Joi.object({
     "number.integer": "Duration must be an integer.",
     "number.min": "Duration must be at least 1 month.",
   }),
+  by: Joi.object({
+    name: Joi.string().required()
+      .messages({
+        'string.empty': 'Name is required',
+        'any.required': 'Name is required'
+      }),
+    phone: Joi.string().required()
+      .messages({
+        'string.empty': 'Phone number is required',
+        'any.required': 'Phone number is required'
+      }),
+    type: Joi.string().required()
+      .messages({
+        'string.empty': 'Type is required',
+        'any.required': 'Type is required'
+      })
+  }).required(),
   interestRate: Joi.number().min(0).required().messages({
     "any.required": "Interest rate is required.",
     "number.base": "Interest rate must be a number.",

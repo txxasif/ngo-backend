@@ -12,7 +12,7 @@ const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
 const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
-const { loanDrawerBankCashHelper, loanReceiverBankCashHelper, savingAccountWithDrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
+const { loanDrawerBankCashHelper, loanReceiverBankCashHelper, savingAccountWithDrawCashHelper, ngoLoanReceiverCashHelper } = require("../../helper/laonDrawerBankCashHelper");
 
 
 const createNewLoanAccountController = asyncHandler(async (req, res) => {
@@ -237,6 +237,11 @@ const countLoanProfitController = asyncHandler(async (req, res) => {
 });
 const ngoLoanCreateController = asyncHandler(async (req, res) => {
   const loanBody = req.body;
+  const payFrom = loanBody.payFrom;
+  const by = loanBody.by;
+  const amount = loanBody.totalAmount;
+  delete loanBody.payFrom;
+
   const { error } = ngoLoanSchemaValidation.validate(loanBody);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -258,7 +263,7 @@ const ngoLoanCreateController = asyncHandler(async (req, res) => {
     newTransaction.date = startDate.clone().add(i, 'months').toISOString();
     transactions.push(newTransaction);
   }
-  console.log(transactions.length);
+  await ngoLoanReceiverCashHelper(payFrom, by, amount, date);
   await NgoLoanTransaction.insertMany(transactions);
 
   return res.json({ message: " done" });

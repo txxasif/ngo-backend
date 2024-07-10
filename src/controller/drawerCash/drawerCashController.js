@@ -17,7 +17,7 @@ const addDrawerCashInOutController = asyncHandler(async (req, res) => {
     selectedSamity.drawerCash -= Number(amount);
   }
   await selectedSamity.save();
-  console.log(drawerCashBody);
+
   const newDrawerCash = new DrawerCash(drawerCashBody);
   await newDrawerCash.save();
   return res.json({ message: "Done" });

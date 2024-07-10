@@ -13,6 +13,10 @@ const drawerCashValidationSchema = Joi.object({
     "any.required": "Samity ID is required",
     "string.base": "Samity ID must be a string",
   }),
+  isCapital: Joi.boolean().required().messages({
+    'any.required': 'isCapital is required',
+    'boolean.base': 'isCapital must be a boolean',
+  }),
   transactionDetails: Joi.object({
     date: Joi.date().required().messages({
       "any.required": "Date is required",

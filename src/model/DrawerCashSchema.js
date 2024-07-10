@@ -6,6 +6,10 @@ const drawerCashSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    isCapital: {
+      type: Boolean,
+      default: false,
+    },
     branchId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Branch",
