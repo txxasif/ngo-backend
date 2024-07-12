@@ -11,6 +11,7 @@ const PaySlip = require("../model/PaySlipSchema");
 const Samity = require("../model/SamitySchema");
 const { SavingsAccount, SavingsAccountTransaction, SavingsAccountWithdraw } = require("../model/SavingAccountsScehma");
 const IncomeHeadTransaction = require("../model/IncomeHeadTransactionSchema");
+const DrawerCash = require("../model/DrawerCashSchema");
 
 async function getDrawerCashHelper() {
     const result = await Samity.aggregate([
@@ -434,6 +435,34 @@ async function ngoLoanExpenseHelper(from, to) {
 
     return result.length > 0 ? result[0].totalAmount : 0;
 }
+async function initialCapitalHelper(from, to) {
+
+    const result = await DrawerCash.aggregate([
+        {
+            $match: {
+                "transactionDetails.date": {
+                    $gte: new Date(from),
+                    $lte: new Date(to)
+                },
+                isCapital: true
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalCapital: { $sum: "$amount" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalCapital: 1
+            }
+        }
+    ]);
+    console.log(result);
+    return result.length > 0 ? result[0].totalCapital : 0;
+}
 module.exports = {
     sumTotalAmountMinusPaid,
     getDrawerCashHelper,
@@ -443,7 +472,6 @@ module.exports = {
     fdrAccountHelper,
     dpsAccountHelper,
     ngoLoanReceivedMoneyHelper,
-    assetHelper,
     userFromAndMemberShipFeeHelper,
     loanInterestHelper,
     salaryPostingHelper,
@@ -453,5 +481,6 @@ module.exports = {
     savingsAccountExpenseHelper,
     fdrAccountExpenseHelper,
     dpsAccountExpenseHelper,
-    ngoLoanExpenseHelper
+    ngoLoanExpenseHelper,
+    initialCapitalHelper
 };

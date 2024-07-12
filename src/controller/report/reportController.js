@@ -5,7 +5,7 @@ const incomeVsExpenseHelper = require("../../helper/incomeVsExpenseHelper");
 
 const balanceSheetController = asyncHandler(async (req, res) => {
     const { from, to } = req.query;
-    const result = await generateBalanceSheet()
+    const result = await generateBalanceSheet(from, to);
     res.json({ data: result });
 });
 const incomeVsExpenseController = asyncHandler(async (req, res) => {

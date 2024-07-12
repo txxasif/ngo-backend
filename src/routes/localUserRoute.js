@@ -10,10 +10,10 @@ const {
 const { verifyJwtBoth } = require("../middleware/verifyJWT");
 const localUserRoute = express.Router();
 
-localUserRoute.get("/all", verifyJwtBoth, getUsersByBranchAndSamityId);
+localUserRoute.get("/all", getUsersByBranchAndSamityId);
 localUserRoute.post("/add", addLocalUserController);
 localUserRoute.put("/update/:id", updateUserDetailsController);
-localUserRoute.get("/pending",localUserPendingListController);
+localUserRoute.get("/pending", localUserPendingListController);
 localUserRoute.get("/accept/:id", acceptUserRequestController);
 localUserRoute.get("/:id", getUserByPhoneNumberController);
 

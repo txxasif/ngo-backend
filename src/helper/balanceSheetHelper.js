@@ -1,3 +1,4 @@
+const incomeVsExpenseHelper = require("./incomeVsExpenseHelper");
 const {
     ngoLoanReceivedMoneyHelper,
     dpsAccountHelper,
@@ -7,10 +8,12 @@ const {
     bankCashHelper,
     employeeSecurityFundHelper,
     sumTotalAmountMinusPaid,
-    assetHelper
+    assetHelper,
+    initialCapitalHelper,
+    incomeHelper,
 
 } = require("./reportHepler");
-async function generateBalanceSheet() {
+async function generateBalanceSheet(from, to) {
     const [
         drawerCash,
         bankCash,
@@ -20,7 +23,11 @@ async function generateBalanceSheet() {
         fdrAccount,
         dpsAccount,
         ngoLoanReceived,
-        assets
+        assets,
+        initialCapital,
+        incomeVsExpense,
+        income
+
     ] = await Promise.all([
         getDrawerCashHelper(),
         bankCashHelper(),
@@ -30,12 +37,23 @@ async function generateBalanceSheet() {
         fdrAccountHelper(),
         dpsAccountHelper(),
         ngoLoanReceivedMoneyHelper(),
-        assetHelper()
+        assetHelper(from, to),
+        initialCapitalHelper(from, to),
+        incomeVsExpenseHelper(from, to),
+        incomeHelper(from, to)
+
     ]);
+    const equity = {
+        initialCapital: initialCapital,
+        donatedCapital: income.reduce((sum, item) => sum + item.totalSum, 0),
+        retainedEarnings: incomeVsExpense.netIncome
+    };
 
     const totalAssets = drawerCash + bankCash + loanInField + assets.reduce((sum, asset) => sum + asset.totalSum, 0);
-    const totalLiabilitiesAndEquity = employeeSecurityFund + memberSavingsAccount + fdrAccount + dpsAccount + ngoLoanReceived;
+    const totalEquity = equity.initialCapital + equity.donatedCapital + Math.abs(equity.retainedEarnings);
 
+    const totalLiabilitiesAndEquity = employeeSecurityFund + memberSavingsAccount + fdrAccount + dpsAccount + ngoLoanReceived + totalEquity;
+    console.log(totalLiabilitiesAndEquity);
     return {
         assets: {
             currentAssets: [
@@ -54,8 +72,14 @@ async function generateBalanceSheet() {
                 { name: "Employee Security Fund", amount: employeeSecurityFund },
                 { name: "NGO Loan", amount: ngoLoanReceived }
             ],
+            equity: [
+                { name: "Initial Capital", amount: equity.initialCapital },
+                { name: "Donated Capital", amount: equity.donatedCapital },
+                { name: "Retained Earnings", amount: equity.retainedEarnings }
+            ],
             total: totalLiabilitiesAndEquity
-        }
+        },
+
     };
 }
 module.exports = {

@@ -53,7 +53,7 @@ async function incomeVsExpenseHelper(from, to) {
 
     const totalExpenses = expenseItems.reduce((sum, item) => sum + item.amount, 0);
 
-    const netLoss = totalExpenses - totalIncome;
+    const netIncome = totalIncome - totalExpenses;
 
     return {
         income: {
@@ -64,7 +64,7 @@ async function incomeVsExpenseHelper(from, to) {
             items: expenseItems,
             total: totalExpenses
         },
-        netLoss: netLoss
+        netIncome: netIncome
     };
 }
 
