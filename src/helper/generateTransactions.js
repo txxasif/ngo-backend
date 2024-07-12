@@ -48,6 +48,7 @@ const generateTransactions = (fdrBody, loanId) => {
     amount: amount,
     date: matureDate,
     status: "unpaid",
+    capital: true
   });
   return transactions;
 };

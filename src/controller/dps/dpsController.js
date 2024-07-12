@@ -122,6 +122,7 @@ const withdrawController = asyncHandler(async (req, res) => {
             .status(400)
             .json({ message: "Insufficient balance for withdrawal" });
     }
+    let expense = ((Number(amount) * (depositAccount.profitPercentage / 100)) / 365) * (depositAccount.periodOfTimeInMonths * 30);
 
     // Update balance
     depositAccount.balance -= Number(amount);
@@ -133,7 +134,8 @@ const withdrawController = asyncHandler(async (req, res) => {
         date,
         description: description,
         amount,
-        by
+        by,
+        expense
     });
 
     // Save withdrawal and deposit account

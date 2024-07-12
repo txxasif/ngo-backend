@@ -44,6 +44,10 @@ const withdrawSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    expense: {
+        type: Number,
+        default: 0
+    },
     description: {
         type: String
     },

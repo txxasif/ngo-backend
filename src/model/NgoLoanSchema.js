@@ -15,7 +15,14 @@ const ngoLoanTransactionSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
-
+  paidDate: {
+    type: Date,
+    default: Date.now,
+  },
+  expense: {
+    type: Number,
+    default: 0
+  },
   by: {
     name: {
       type: String,

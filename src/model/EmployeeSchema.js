@@ -26,7 +26,7 @@ const employeeSchema = new Schema({
   educationalQualification: String,
   dateOfBirth: Date,
   mobileNumber: {
-    type: Number,
+    type: String,
     index: true,
 
   },

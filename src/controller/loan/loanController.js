@@ -9,7 +9,6 @@ const mongoose = require("mongoose");
 const Samity = require("../../model/SamitySchema");
 const ngoLoanSchemaValidation = require("../../schemaValidation/ngoLoanSchemaValidation");
 const { NgoLoan, NgoLoanTransaction } = require("../../model/NgoLoanSchema");
-const { DepositAccount } = require("../../model/DepositAccountSchema");
 const moment = require("moment");
 const { SavingsAccount } = require("../../model/SavingAccountsScehma");
 const { loanDrawerBankCashHelper, loanReceiverBankCashHelper, savingAccountWithDrawCashHelper, ngoLoanReceiverCashHelper } = require("../../helper/laonDrawerBankCashHelper");
@@ -300,7 +299,7 @@ const ngoLoanPayListController = asyncHandler(async (req, res) => {
 
 const ngoLoanPayController = asyncHandler(async (req, res) => {
   const body = req.body;
-  console.log(body);
+
   let date = body.date;
   let by = body.by;
   let payFrom = body.payFrom;
@@ -312,12 +311,19 @@ const ngoLoanPayController = asyncHandler(async (req, res) => {
   }
   const ngoLoanAccount = await NgoLoan.findOne({ _id: ngoLoanId });
   ngoLoanAccount.totalPaid += amount;
+  let loanAmount = ngoLoanAccount.amount;
+  let totalAmount = ngoLoanAccount.totalAmount;
+  let interestAmount = totalAmount - loanAmount;
+  let expense = interestAmount / ngoLoanAccount.durationInMonth;
+  console.log(expense);
   await ngoLoanAccount.save();
   const newTransaction = await NgoLoanTransaction.findOne({ _id: transactionId });
   newTransaction.status = "paid";
+  newTransaction.expense = expense;
+  newTransaction.paidDate = date;
   newTransaction.by = by;
   await newTransaction.save();
-  console.log('hitt');
+
   await savingAccountWithDrawCashHelper(payFrom, by, amount, date, "Ngo Loan");
   return res.json({ message: "Payment Done" });
 });

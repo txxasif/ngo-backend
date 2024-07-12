@@ -6,8 +6,7 @@ const connectDB = require("./config/dbConnection");
 const server = http.createServer(app);
 const port = process.env.PORT || 5000;
 
-const numCPUs = require('os').cpus().length;
-console.log(numCPUs);
+
 connectDB();
 
 mongoose.connection.once("open", () => {

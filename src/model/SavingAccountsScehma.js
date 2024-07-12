@@ -5,6 +5,7 @@ const transactionSchema = new mongoose.Schema({
     ref: "DepositAccount",
     required: true,
   },
+
   date: {
     type: Date,
     required: true,
@@ -43,6 +44,10 @@ const withdrawSchema = new mongoose.Schema({
   amount: {
     type: Number,
     required: true,
+  },
+  expense: {
+    type: Number,
+    default: 0
   },
   description: {
     type: String

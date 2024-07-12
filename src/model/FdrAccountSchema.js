@@ -19,6 +19,10 @@ const transactionSchema = new mongoose.Schema(
             type: String,
             enum: ['paid', 'unpaid'],
         },
+        capital: {
+            type: Boolean,
+            default: false
+        },
         by: {
             name: {
                 type: String,
