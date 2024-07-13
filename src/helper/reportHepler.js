@@ -31,7 +31,7 @@ async function bankCashHelper() {
     const totalBankCash = result[0]?.total || 0;
     return totalBankCash;
 }
-async function sumTotalAmountMinusPaid() {
+async function loanInFieldHelper() {
     const result = await LoanAccount.aggregate([
         {
             $project: {
@@ -463,8 +463,9 @@ async function initialCapitalHelper(from, to) {
     console.log(result);
     return result.length > 0 ? result[0].totalCapital : 0;
 }
+
 module.exports = {
-    sumTotalAmountMinusPaid,
+    loanInFieldHelper,
     getDrawerCashHelper,
     bankCashHelper,
     employeeSecurityFundHelper,

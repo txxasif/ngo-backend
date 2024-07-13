@@ -6,7 +6,6 @@ const { LoanAccount } = require("../model/LoanAccountSchema");
 const LocalUser = require("../model/LocalUserSchema");
 const { NgoLoan } = require("../model/NgoLoanSchema");
 const Samity = require("../model/SamitySchema");
-
 async function countProfit() {
   const loanAccountResult = LoanAccount.aggregate([
     {

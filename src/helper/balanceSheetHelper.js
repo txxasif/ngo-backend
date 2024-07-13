@@ -7,12 +7,12 @@ const {
     memberSavingsAccountHelper,
     bankCashHelper,
     employeeSecurityFundHelper,
-    sumTotalAmountMinusPaid,
     assetHelper,
     initialCapitalHelper,
     incomeHelper,
-
+    loanInFieldHelper,
 } = require("./reportHepler");
+
 async function generateBalanceSheet(from, to) {
     const [
         drawerCash,
@@ -27,11 +27,10 @@ async function generateBalanceSheet(from, to) {
         initialCapital,
         incomeVsExpense,
         income
-
     ] = await Promise.all([
         getDrawerCashHelper(),
         bankCashHelper(),
-        sumTotalAmountMinusPaid(),
+        loanInFieldHelper(),
         employeeSecurityFundHelper(),
         memberSavingsAccountHelper(),
         fdrAccountHelper(),
@@ -41,19 +40,20 @@ async function generateBalanceSheet(from, to) {
         initialCapitalHelper(from, to),
         incomeVsExpenseHelper(from, to),
         incomeHelper(from, to)
-
     ]);
+
     const equity = {
         initialCapital: initialCapital,
         donatedCapital: income.reduce((sum, item) => sum + item.totalSum, 0),
-        retainedEarnings: incomeVsExpense.netIncome
+        retainedEarnings: incomeVsExpense.netIncome < 0 ? incomeVsExpense.netIncome : 0
     };
 
     const totalAssets = drawerCash + bankCash + loanInField + assets.reduce((sum, asset) => sum + asset.totalSum, 0);
-    const totalEquity = equity.initialCapital + equity.donatedCapital + Math.abs(equity.retainedEarnings);
+    const totalEquity = equity.initialCapital + equity.donatedCapital + equity.retainedEarnings;
 
     const totalLiabilitiesAndEquity = employeeSecurityFund + memberSavingsAccount + fdrAccount + dpsAccount + ngoLoanReceived + totalEquity;
     console.log(totalLiabilitiesAndEquity);
+
     return {
         assets: {
             currentAssets: [
@@ -79,9 +79,9 @@ async function generateBalanceSheet(from, to) {
             ],
             total: totalLiabilitiesAndEquity
         },
-
     };
 }
+
 module.exports = {
     generateBalanceSheet
-}
+};
