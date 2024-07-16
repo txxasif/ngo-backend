@@ -90,7 +90,7 @@ async function fdrAccountHelper() {
 async function dpsAccountHelper() {
     const result = await DpsAccount.aggregate([
         {
-            $group: { _id: null, total: { $sum: "$balance" } },
+            $group: { _id: null, total: { $sum: "$totalDeposit" } },
         },
     ]);
     const totalDpsAccount = result[0]?.total || 0;
