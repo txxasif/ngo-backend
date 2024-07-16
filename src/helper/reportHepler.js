@@ -218,6 +218,7 @@ async function salaryPostingHelper(fromDate, toDate) {
     return total;
 }
 async function expenseHelper(from, to) {
+    console.log("asif");
     const result = await Expense.aggregate([
         {
             $match: {
@@ -252,47 +253,10 @@ async function expenseHelper(from, to) {
             },
         },
     ]);
-
+    console.log(result, 'expensse========');
     return result;
 }
-async function expenseHelper(from, to) {
-    const result = await Asset.aggregate([
-        {
-            $match: {
-                date: {
-                    $gte: new Date(from),
-                    $lte: new Date(to),
-                },
-            },
-        },
-        {
-            $group: {
-                _id: "$headId",
-                headName: { $first: "$headDetails.name" }, // Assuming you want to include headName
-                totalSum: { $sum: "$total" },
-            },
-        },
-        {
-            $lookup: {
-                from: "assetheads", // Adjust based on your collection name
-                localField: "_id",
-                foreignField: "_id",
-                as: "headDetails",
-            },
-        },
-        {
-            $unwind: "$headDetails",
-        },
-        {
-            $project: {
-                headName: "$headDetails.name", // Extract headName from headDetails
-                totalSum: 1,
-            },
-        },
-    ]);
 
-    return result;
-}
 async function incomeHelper(from, to) {
     const result = await IncomeHeadTransaction.aggregate([
         {
