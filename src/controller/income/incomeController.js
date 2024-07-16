@@ -24,6 +24,7 @@ const getAllIncomeHeadController = asyncHandler(async (req, res) => {
 // create income head transaction
 const createIncomeHeadTransactionController = asyncHandler(async (req, res) => {
     const { payFrom, ...incomeHeadData } = req.body;
+    console.log(req.body);
 
     const { error } = incomeHeadSchemaValidation.validate(incomeHeadData);
     if (error) {
@@ -31,6 +32,7 @@ const createIncomeHeadTransactionController = asyncHandler(async (req, res) => {
     }
 
     const { date, amount, by } = incomeHeadData;
+
 
     try {
         const newIncomeHead = new IncomeHeadTransaction(incomeHeadData);

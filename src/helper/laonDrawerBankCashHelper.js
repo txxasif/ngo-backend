@@ -388,7 +388,7 @@ async function localUserCashHelper(samityId, by, amount, date) {
 }
 async function incomeCashHelper(payFrom, by, amount, date) {
     const { _id, type } = payFrom;
-    console.log('hii');
+    console.log(amount, 'hii');
     if (type === "drawer") {
         // Handle drawer cash transaction
         const samity = await Samity.findOne({ _id: _id });
