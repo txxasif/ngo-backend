@@ -39,9 +39,9 @@ async function loanInFieldHelper() {
             $project: {
                 difference: {
                     $cond: {
-                        if: { $lt: [{ $subtract: ["$totalAmount", "$paid"] }, 0] },
+                        if: { $lt: [{ $subtract: ["$loanAmount", "$paid"] }, 0] },
                         then: 0,
-                        else: { $subtract: ["$totalAmount", "$paid"] },
+                        else: { $subtract: ["$loanAmount", "$paid"] },
                     },
                 },
             },
