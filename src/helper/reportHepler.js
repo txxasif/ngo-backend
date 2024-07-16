@@ -72,7 +72,7 @@ async function employeeSecurityFundHelper() {
 async function memberSavingsAccountHelper() {
     const result = await SavingsAccount.aggregate([
         {
-            $group: { _id: null, total: { $sum: "$balance" } },
+            $group: { _id: null, total: { $sum: "$totalDeposit" } },
         },
     ]);
     const totalMemberSavingsAccount = result[0]?.total || 0;
