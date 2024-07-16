@@ -6,6 +6,10 @@ const bankCashSchema = new mongoose.Schema(
             ref: "Bank",
             required: true,
         },
+        isCapital: {
+            type: Boolean,
+            default: false,
+        },
         amount: {
             type: Number,
             required: true,
