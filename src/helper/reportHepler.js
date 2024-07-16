@@ -81,7 +81,7 @@ async function memberSavingsAccountHelper() {
 async function fdrAccountHelper() {
     const result = await FdrAccount.aggregate([
         {
-            $group: { _id: null, total: { $sum: "$balance" } },
+            $group: { _id: null, total: { $sum: "$amount" } },
         },
     ]);
     const totalFdrAccount = result[0]?.total || 0;
