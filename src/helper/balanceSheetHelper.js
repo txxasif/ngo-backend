@@ -11,6 +11,7 @@ const {
     initialCapitalHelper,
     incomeHelper,
     loanInFieldHelper,
+    donationHelper
 } = require("./reportHepler");
 
 async function generateBalanceSheet(from, to) {
@@ -26,7 +27,7 @@ async function generateBalanceSheet(from, to) {
         assets,
         initialCapital,
         incomeVsExpense,
-        income
+        donation
     ] = await Promise.all([
         getDrawerCashHelper(),
         bankCashHelper(),
@@ -39,20 +40,18 @@ async function generateBalanceSheet(from, to) {
         assetHelper(from, to),
         initialCapitalHelper(from, to),
         incomeVsExpenseHelper(from, to),
-        incomeHelper(from, to)
+        donationHelper(from, to)
     ]);
-
     const equity = {
         initialCapital: initialCapital,
-        donatedCapital: income.reduce((sum, item) => sum + item.totalSum, 0),
-        retainedEarnings: incomeVsExpense.netIncome < 0 ? incomeVsExpense.netIncome : 0
+        donatedCapital: donation.reduce((sum, item) => sum + item.amount, 0),
+        retainedEarnings: incomeVsExpense.netIncome
     };
-
+    const newEquity = donation.map((donation) => ({ name: `${donation.name} (Donation)`, amount: donation.amount }));
     const totalAssets = drawerCash + bankCash + loanInField + assets.reduce((sum, asset) => sum + asset.totalSum, 0);
-    const totalEquity = equity.initialCapital + equity.donatedCapital + equity.retainedEarnings;
+    const totalEquity = equity.initialCapital + equity.donatedCapital + Math.abs(equity.retainedEarnings);
 
     const totalLiabilitiesAndEquity = employeeSecurityFund + memberSavingsAccount + fdrAccount + dpsAccount + ngoLoanReceived + totalEquity;
-    console.log(totalLiabilitiesAndEquity);
 
     return {
         assets: {
@@ -74,8 +73,9 @@ async function generateBalanceSheet(from, to) {
             ],
             equity: [
                 { name: "Initial Capital", amount: equity.initialCapital },
-                { name: "Donated Capital", amount: equity.donatedCapital },
-                { name: "Retained Earnings", amount: equity.retainedEarnings }
+                { name: "Retained Earnings", amount: equity.retainedEarnings },
+                ...newEquity
+
             ],
             total: totalLiabilitiesAndEquity
         },

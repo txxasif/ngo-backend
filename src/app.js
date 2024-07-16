@@ -27,6 +27,7 @@ const dpsRoute = require("./routes/dpsRoute");
 const incomeRoute = require("./routes/incomeRoute");
 const DrawerCash = require("./model/DrawerCashSchema");
 const reportRoute = require("./routes/reportRoute");
+const donationRoute = require("./routes/donationRoute");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -52,6 +53,7 @@ app.use("/praying-application", prayingAmountRoute);
 app.use("/pay-slip", paySlipRoute);
 app.use("/asset", assetRoute);
 app.use("/liabilities", liabilitiesRoute);
+app.use("/donation", donationRoute);
 app.use("/report", reportRoute);
 // app.get('/script', async (req, res) => {
 //   await DrawerCash.updateMany({}, { $set: { isCapital: false } });

@@ -12,6 +12,8 @@ const Samity = require("../model/SamitySchema");
 const { SavingsAccount, SavingsAccountTransaction, SavingsAccountWithdraw } = require("../model/SavingAccountsScehma");
 const IncomeHeadTransaction = require("../model/IncomeHeadTransactionSchema");
 const DrawerCash = require("../model/DrawerCashSchema");
+const BankCash = require("../model/BankCashCash");
+const Donation = require("../model/DonationSchema");
 
 async function getDrawerCashHelper() {
     const result = await Samity.aggregate([
@@ -321,6 +323,7 @@ async function incomeHelper(from, to) {
         },
         {
             $project: {
+                _id: 0,
                 headName: "$headDetails.head", // Extract headName from headDetails
                 totalSum: 1,
             },
@@ -444,7 +447,8 @@ async function initialCapitalHelper(from, to) {
                     $gte: new Date(from),
                     $lte: new Date(to)
                 },
-                isCapital: true
+                isCapital: true,
+                type: "cashIn"
             }
         },
         {
@@ -460,8 +464,54 @@ async function initialCapitalHelper(from, to) {
             }
         }
     ]);
-    console.log(result);
-    return result.length > 0 ? result[0].totalCapital : 0;
+    const result1 = await BankCash.aggregate([
+        {
+            $match: {
+                "transactionDetails.date": {
+                    $gte: new Date(from),
+                    $lte: new Date(to)
+                },
+                isCapital: true,
+                type: "cashIn"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalCapital: { $sum: "$amount" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalCapital: 1
+            }
+        }
+    ]);
+    const drawerCapital = result.length > 0 ? result[0].totalCapital : 0;
+    const bankCapital = result1.length > 0 ? result1[0].totalCapital : 0;
+    console.log(drawerCapital, bankCapital);
+    return drawerCapital + bankCapital;
+}
+async function donationHelper(from, to) {
+    const result = await Donation.aggregate([
+        {
+            $match: {
+                date: {
+                    $gte: new Date(from),
+                    $lte: new Date(to)
+                },
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                name: "$from",
+                amount: 1
+            }
+        }
+    ]);
+    return result;
 }
 
 module.exports = {
@@ -483,5 +533,6 @@ module.exports = {
     fdrAccountExpenseHelper,
     dpsAccountExpenseHelper,
     ngoLoanExpenseHelper,
-    initialCapitalHelper
+    initialCapitalHelper,
+    donationHelper
 };

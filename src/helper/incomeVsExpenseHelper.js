@@ -17,11 +17,18 @@ async function calculateIncome(from, to) {
         loanInterestHelper(from, to),
         incomeHelper(from, to)
     ]);
+    const newIncome = {}
 
+    incomes.forEach(element => {
+        newIncome[element.headName] = (element.totalSum || 0)
+    });
     const income = {
         "Membership and Form Fees": membershipFee,
         "Interest Income on Loans": loanInterest,
+        ...newIncome
+
     };
+    console.log(income);
 
     incomes.forEach(item => {
         income[item.headName] = (income[item.headName] || 0) + item.totalSum;

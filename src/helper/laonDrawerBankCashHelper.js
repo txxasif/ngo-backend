@@ -619,4 +619,46 @@ async function ngoLoanReceiverCashHelper(payFrom, by, amount, date) {
         await Promise.all([selectedBank.save(), newBankCash.save()]);
     }
 }
-module.exports = { ngoLoanReceiverCashHelper, employeeSecurityFundCashHelper, paySlipCashHelper, advanceSalaryCashHelper, incomeCashHelper, localUserCashHelper, assetWithdrawCashHelper, expenseWithdrawCashHelper, fdrAccountWithdrawCashHelper, fdrAccountOpeningCashHelper, savingAccountWithDrawCashHelper, savingAccountDepositCashHelper, loanDrawerBankCashHelper, loanReceiverBankCashHelper }
+async function donationReceiverCashHelper(payFrom, by, amount, date) {
+    const { _id, type } = payFrom;
+    if (type === "drawer") {
+        // Handle drawer cash transaction
+        const samity = await Samity.findOne({ _id: _id });
+        samity.drawerCash += Number(amount);
+
+        const drawerCashBody = {
+            amount: Number(amount),
+            branchId: samity.branchId,
+            samityId: _id,
+            type: 'cashIn',
+            transactionDetails: {
+                date: date,
+                sourceDetails: "Donation Received",
+                by: by
+            }
+        }
+        const newDrawerCash = new DrawerCash(drawerCashBody);
+        await Promise.all([samity.save(), newDrawerCash.save()])
+    } else {
+        // Handle bank cash transaction
+        const selectedBank = await Bank.findOne({
+            _id: _id
+        });
+        selectedBank.balance += Number(amount);
+
+        const bankCashBody = {
+            amount: Number(amount),
+            bankId: _id,
+            type: 'cashIn',
+            transactionDetails: {
+                date: date,
+                sourceDetails: "Donation Received",
+                by: by
+            }
+        }
+
+        const newBankCash = new BankCash(bankCashBody);
+        await Promise.all([selectedBank.save(), newBankCash.save()]);
+    }
+}
+module.exports = { donationReceiverCashHelper, ngoLoanReceiverCashHelper, employeeSecurityFundCashHelper, paySlipCashHelper, advanceSalaryCashHelper, incomeCashHelper, localUserCashHelper, assetWithdrawCashHelper, expenseWithdrawCashHelper, fdrAccountWithdrawCashHelper, fdrAccountOpeningCashHelper, savingAccountWithDrawCashHelper, savingAccountDepositCashHelper, loanDrawerBankCashHelper, loanReceiverBankCashHelper }
