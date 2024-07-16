@@ -56,7 +56,6 @@ async function calculateExpenses(from, to) {
         { name: "DPS Interest Expense", amount: dpsExpense },
         { name: "Ngo Loan Interest Expense", amount: ngoLoanExpense },
         ...expenses.map(e => ({ name: e.headName, amount: e.totalSum })),
-        ...assets.map(a => ({ name: a.headName, amount: a.totalSum })),
 
     ];
 
