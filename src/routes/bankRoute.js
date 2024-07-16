@@ -3,6 +3,7 @@ const {
   addBankController,
   getAllBankController,
   addBankTransactionController,
+  transferMoneyController,
   allBankCashDetailsController,
   getSpecificDetailsByBankIdController
 } = require("../controller/bank/bankController");
@@ -15,6 +16,7 @@ bankRoute.post(
   "/money-add",
   addBankTransactionController
 );
+bankRoute.post("/transfer", transferMoneyController);
 bankRoute.get("/bank/:id", getSpecificDetailsByBankIdController);
 
 module.exports = bankRoute;
