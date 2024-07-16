@@ -17,8 +17,7 @@ async function calculateIncome(from, to) {
         loanInterestHelper(from, to),
         incomeHelper(from, to)
     ]);
-    const newIncome = {}
-
+    const newIncome = {};
     incomes.forEach(element => {
         newIncome[element.headName] = (element.totalSum || 0)
     });
@@ -28,14 +27,11 @@ async function calculateIncome(from, to) {
         ...newIncome
 
     };
-    console.log(income);
 
-    incomes.forEach(item => {
-        income[item.headName] = (income[item.headName] || 0) + item.totalSum;
-    });
+
 
     const totalIncome = Object.values(income).reduce((sum, value) => sum + value, 0);
-
+    console.log(totalIncome);
     return {
         items: income,
         total: totalIncome
@@ -63,7 +59,6 @@ async function calculateExpenses(from, to) {
         ...assets.map(a => ({ name: a.headName, amount: a.totalSum })),
 
     ];
-    console.log(assets);
 
     const totalExpenses = expenseItems.reduce((sum, item) => sum + item.amount, 0);
 
