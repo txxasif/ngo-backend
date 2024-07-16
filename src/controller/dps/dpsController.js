@@ -96,6 +96,46 @@ const makeDepositController = asyncHandler(async (req, res) => {
     ]);
     return res.status(200).json({ message: "Deposit money saved successfully" });
 });
+const dpsAccountListByBrachAndSamityController = asyncHandler(
+    async (req, res) => {
+        const { branchId, samityId } = req.query;
+
+        const data = await DpsAccount.aggregate([
+            {
+                $match: {
+                    branchId: new mongoose.Types.ObjectId(branchId),
+                    samityId: new mongoose.Types.ObjectId(samityId),
+                },
+            },
+            {
+                $lookup: {
+                    from: "localusers",
+                    localField: "memberId",
+                    foreignField: "_id",
+                    as: "memberDetails",
+                },
+            },
+            {
+                $unwind: "$memberDetails",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    memberId: 1,
+                    branchId: 1,
+                    samityId: 1,
+                    paymentTerm: 1,
+                    openingDate: 1,
+                    balance: 1,
+                    totalWithdraw: 1,
+                    "memberDetails.name": 1,
+                    "memberDetails.mobileNumber": 1,
+                },
+            },
+        ]);
+        return res.json({ data });
+    }
+);
 // * withdrawAccount
 const withdrawController = asyncHandler(async (req, res) => {
     const body = req.body;
@@ -176,4 +216,4 @@ const transactionDetailsController = asyncHandler(async (req, res) => {
     return res.json({ data })
 });
 
-module.exports = { createDpsAccountController, transactionDetailsController, withdrawController, withdrawDetailsController, getSpecificDetailsForDpsAccountController, withdrawDetailsController, makeDepositController }
+module.exports = { dpsAccountListByBrachAndSamityController, createDpsAccountController, transactionDetailsController, withdrawController, withdrawDetailsController, getSpecificDetailsForDpsAccountController, withdrawDetailsController, makeDepositController }

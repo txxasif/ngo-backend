@@ -1,8 +1,9 @@
 const express = require("express");
-const { createFdrAccountController, getSpecificDetailsForFdrAccountController, transactionDetailsController, withdrawController, makeDepositController, withdrawDetailsController } = require("../controller/fdr/fdrController");
+const { fdrAccountListByBrachAndSamityController, createFdrAccountController, getSpecificDetailsForFdrAccountController, transactionDetailsController, withdrawController, makeDepositController, withdrawDetailsController } = require("../controller/fdr/fdrController");
 const fdrRoute = express.Router();
 
 fdrRoute.post("/create", createFdrAccountController);
+fdrRoute.get("/list", fdrAccountListByBrachAndSamityController);
 fdrRoute.get("/deposit-account/:id", getSpecificDetailsForFdrAccountController);
 fdrRoute.post("/makeDeposit", makeDepositController);
 fdrRoute.post("/makeWithdraw", withdrawController);

@@ -1,8 +1,9 @@
 const express = require("express");
-const { createDpsAccountController, transactionDetailsController, getSpecificDetailsForDpsAccountController, withdrawController, withdrawDetailsController, makeDepositController } = require("../controller/dps/dpsController");
+const { dpsAccountListByBrachAndSamityController, createDpsAccountController, transactionDetailsController, getSpecificDetailsForDpsAccountController, withdrawController, withdrawDetailsController, makeDepositController } = require("../controller/dps/dpsController");
 const dpsRoute = express.Router();
 
-dpsRoute.post("/create", createDpsAccountController)
+dpsRoute.post("/create", createDpsAccountController);
+dpsRoute.get("/list", dpsAccountListByBrachAndSamityController);
 dpsRoute.get("/deposit-account/:id", getSpecificDetailsForDpsAccountController);
 dpsRoute.post("/makeDeposit", makeDepositController);
 dpsRoute.post("/makeWithdraw", withdrawController);

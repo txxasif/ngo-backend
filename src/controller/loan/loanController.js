@@ -116,9 +116,10 @@ const searchLoanAccountsTransactionsController = asyncHandler(
 const payLoanAccountController = asyncHandler(async (req, res) => {
   const body = req.body;
   const { loanId, amount, addFineAmount, payFineAmount, date, by } = body;
-
+  console.log(body, 'loand ---------');
   let payFrom = body.payFrom;
   delete body.payFrom;
+
 
   const selectedLoanAccount = await LoanAccount.findOne({ _id: loanId });
   if (addFineAmount > 0) {
@@ -156,7 +157,7 @@ const payLoanAccountController = asyncHandler(async (req, res) => {
     newLoanTransaction.save(),
     loanReceiverBankCashHelper(payFrom, by, amount, date)
   ]);
-
+  console.log('money paid');
   res.json({ message: "done" });
 });
 

@@ -30,7 +30,46 @@ const createSavingsAccountController = asyncHandler(async (req, res) => {
         .status(200)
         .json({ message: "Savings account created successfully" });
 });
+const savingsAccountListByBrachAndSamityController = asyncHandler(
+    async (req, res) => {
+        const { branchId, samityId } = req.query;
 
+        const data = await SavingsAccount.aggregate([
+            {
+                $match: {
+                    branchId: new mongoose.Types.ObjectId(branchId),
+                    samityId: new mongoose.Types.ObjectId(samityId),
+                },
+            },
+            {
+                $lookup: {
+                    from: "localusers",
+                    localField: "memberId",
+                    foreignField: "_id",
+                    as: "memberDetails",
+                },
+            },
+            {
+                $unwind: "$memberDetails",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    memberId: 1,
+                    branchId: 1,
+                    samityId: 1,
+                    paymentTerm: 1,
+                    openingDate: 1,
+                    balance: 1,
+                    totalDeposit: 1,
+                    "memberDetails.name": 1,
+                    "memberDetails.mobileNumber": 1,
+                },
+            },
+        ]);
+        return res.json({ data });
+    }
+);
 /**
  * Retrieves specific details for a savings account
  * @param {Object} req - The request object
@@ -119,7 +158,7 @@ const makeDepositController = asyncHandler(async (req, res) => {
  */
 const withdrawController = asyncHandler(async (req, res) => {
     const body = req.body;
-    console.log(req.body);
+    console.log(req.body, 'savingssssssss----');
     const { id, amount, date, description } = body;
     let payFrom = body.payFrom;
     let by = body.by;
@@ -157,6 +196,7 @@ const withdrawController = asyncHandler(async (req, res) => {
         expense
     });
     await Promise.all([withdrawal.save(), depositAccount.save(), savingAccountWithDrawCashHelper(payFrom, by, amount, date, 'Savings')]);
+    console.log('withdraws done');
     return res
         .status(200)
         .json({ message: "Withdrawal successful", depositAccount });
@@ -202,5 +242,6 @@ module.exports = {
     withdrawController,
     transactionDetailsController,
     withdrawDetailsController,
-    getSpecificDetailsForSavingsAccountController
+    getSpecificDetailsForSavingsAccountController,
+    savingsAccountListByBrachAndSamityController
 }
