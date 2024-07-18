@@ -1,8 +1,7 @@
 const express = require("express");
-const {
-  getLiabilitiesDetailsController,
-} = require("../controller/liabilities/liabilitiesController");
+const { createExpenseLiabilityController, createAssetLiabilityController } = require("../controller/liabilities/liabilitiesController");
 const liabilitiesRoute = express.Router();
 
-liabilitiesRoute.get("/details", getLiabilitiesDetailsController);
+liabilitiesRoute.post("/expense/create", createExpenseLiabilityController);
+liabilitiesRoute.post("/asset/create", createAssetLiabilityController);
 module.exports = liabilitiesRoute;
