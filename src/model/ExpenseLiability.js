@@ -34,14 +34,8 @@ const expenseLiabilitySchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
-        paidDate: {
-            type: Date,
-        },
-        status: {
-            type: String,
-            enum: ["paid", "unpaid"],
-            default: "unpaid",
-        },
+
+
         amount: {
             type: Number,
             default: 0,

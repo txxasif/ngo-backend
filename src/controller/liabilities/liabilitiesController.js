@@ -18,10 +18,9 @@ const createExpenseLiabilityController = asyncHandler(async (req, res) => {
 const getExpenseLiabilityListController = asyncHandler(async (req, res) => {
   try {
     const { branchId, samityId } = req.query;
-    console.log("hiiiiiiiii");
     const data = await ExpenseLiability.aggregate([
       {
-        $match: { branchId: new mongoose.Types.ObjectId(branchId), samityId: new mongoose.Types.ObjectId(samityId), status: "unpaid" }
+        $match: { branchId: new mongoose.Types.ObjectId(branchId), samityId: new mongoose.Types.ObjectId(samityId) }
       },
       {
         $lookup: {
@@ -60,9 +59,8 @@ const getExpenseLiabilityListController = asyncHandler(async (req, res) => {
 
 })
 const payExpenseLiabilityController = asyncHandler(async (req, res) => {
-  const body = req.body;
-  const { expenseId, date } = body;
-  const response = await ExpenseLiability.findOneAndUpdate({ _id: expenseId }, { status: "paid", paidDate: date }, { new: true });
+  const expenseId = req.params.id;
+  const response = await ExpenseLiability.findOneAndDelete({ _id: expenseId });
   console.log(response);
 
   if (!response) {
@@ -127,8 +125,6 @@ const getAssetLiabilityListController = asyncHandler(async (req, res) => {
 })
 const payAssetLiabilityController = asyncHandler(async (req, res) => {
   const liabilityId = req.params.id;
-  console.log(liabilityId);
-
   const response = await AssetLiability.findOneAndDelete({ _id: liabilityId });
   return res.json({ message: "done" });
 })

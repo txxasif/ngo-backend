@@ -3,7 +3,7 @@ const { payExpenseLiabilityController, createExpenseLiabilityController, createA
 const liabilitiesRoute = express.Router();
 
 liabilitiesRoute.post("/expense/create", createExpenseLiabilityController);
-liabilitiesRoute.post("/expense/pay", payExpenseLiabilityController);
+liabilitiesRoute.get("/expense/pay/:id", payExpenseLiabilityController);
 liabilitiesRoute.get("/expense/list", getExpenseLiabilityListController);
 liabilitiesRoute.post("/asset/create", createAssetLiabilityController);
 liabilitiesRoute.get("/asset/list", getAssetLiabilityListController);

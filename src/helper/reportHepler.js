@@ -14,6 +14,9 @@ const IncomeHeadTransaction = require("../model/IncomeHeadTransactionSchema");
 const DrawerCash = require("../model/DrawerCashSchema");
 const BankCash = require("../model/BankCashCash");
 const Donation = require("../model/DonationSchema");
+const ExpenseLiability = require("../model/ExpenseLiability");
+const AssetLiability = require("../model/AssetLiability");
+
 
 async function getDrawerCashHelper() {
     const result = await Samity.aggregate([
@@ -253,7 +256,6 @@ async function expenseHelper(from, to) {
             },
         },
     ]);
-    console.log(result, 'expensse========');
     return result;
 }
 
@@ -454,7 +456,6 @@ async function initialCapitalHelper(from, to) {
     ]);
     const drawerCapital = result.length > 0 ? result[0].totalCapital : 0;
     const bankCapital = result1.length > 0 ? result1[0].totalCapital : 0;
-    console.log(drawerCapital, bankCapital);
     return drawerCapital + bankCapital;
 }
 async function donationHelper(from, to) {
@@ -477,7 +478,68 @@ async function donationHelper(from, to) {
     ]);
     return result;
 }
+// ! Expense Liability 
+async function expenseLiabilityHelper(from, to) {
 
+    const result = await ExpenseLiability.aggregate([
+        {
+            $match: {
+                date: {
+                    $gte: new Date(from),
+                    $lte: new Date(to)
+                },
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalAmount: 1
+            }
+        }
+    ]);
+
+    return result.length > 0 ? result[0].totalAmount : 0;
+}
+async function liabilityAssetHelper() {
+
+    const result = await AssetLiability.aggregate([
+        {
+            $lookup: {
+                from: "assetheads", // the name of the collection in the database
+                localField: "headId",
+                foreignField: "_id",
+                as: "headDetails",
+            },
+        },
+        {
+            $unwind: "$headDetails",
+        },
+        {
+            $group: {
+                _id: "$headId",
+                headName: { $first: "$headDetails.name" },
+                totalSum: { $sum: "$total" },
+            },
+        },
+        {
+            $project: {
+                headName: 1,
+                totalSum: 1,
+            },
+        },
+    ]);
+
+
+    console.log(result, "result");
+
+    return result;
+}
 module.exports = {
     loanInFieldHelper,
     getDrawerCashHelper,
@@ -498,5 +560,7 @@ module.exports = {
     dpsAccountExpenseHelper,
     ngoLoanExpenseHelper,
     initialCapitalHelper,
-    donationHelper
+    donationHelper,
+    expenseLiabilityHelper,
+    liabilityAssetHelper
 };
