@@ -3,6 +3,7 @@ const expenseValidationSchema = require("../../schemaValidation/expenseSchemaVal
 const Expense = require("../../model/ExpenseSchema");
 const ExpenseHead = require("../../model/ExpenseHeadSchema");
 const { expenseWithdrawCashHelper } = require("../../helper/laonDrawerBankCashHelper");
+const mongoose = require("mongoose");
 //  Controller for creating monthly expenses
 const createMonthlyExpenseController = asyncHandler(async (req, res) => {
   const monthlyExpenseBody = req.body;
@@ -38,25 +39,77 @@ const getExpenseHeadListController = asyncHandler(async (req, res) => {
 
 
 // Controller for getting expense list
-const getExpenseList = asyncHandler(async (req, res) => {
-  const { branchId, samityId, type } = req.query;
-  let data = [];
+const getExpenseListController = asyncHandler(async (req, res) => {
+  const { branchId, samityId, from, to } = req.query;
+  console.log(from, to);
 
-  // Fetch expenses based on the type (monthly or purchase)
-  if (type === "monthly") {
-    const monthly = await Expense.find({ branchId, samityId }).lean();
-    data = monthly;
-  } else {
-    const purchase = await Purchase.find({ branchId, samityId }).lean();
-    data = purchase;
+
+  // Convert from and to to Date objects if they exist
+  const fromDate = from ? new Date(from) : null;
+  const toDate = to ? new Date(to) : null;
+
+  // Build the aggregation pipeline
+  const pipeline = [
+    {
+      $match: {
+        branchId: new mongoose.Types.ObjectId(branchId),
+        samityId: new mongoose.Types.ObjectId(samityId),
+        ...(fromDate && toDate ? { date: { $gte: fromDate, $lte: toDate } } : {}),
+      },
+    },
+
+    {
+      $sort: { date: -1 } // Optional: sort by date in descending order
+    }
+  ];
+
+  try {
+    const data = await Expense.aggregate([
+      {
+        $match: {
+          branchId: new mongoose.Types.ObjectId(branchId),
+          samityId: new mongoose.Types.ObjectId(samityId),
+          ...(fromDate && toDate ? { date: { $gte: fromDate, $lte: toDate } } : {}),
+        },
+      },
+      {
+        $lookup: {
+          from: "expenseheads", // Name of the collection for ExpenseHead
+          localField: "headId",
+          foreignField: "_id",
+          as: "head",
+        },
+      },
+      {
+        $unwind: "$head", // Deconstruct the array from the $lookup stage
+      },
+      {
+        $project: {
+          _id: 0, // Exclude the _id field
+          headName: "$head.name",
+          date: 1,
+          amount: 1,
+          by: 1, // Include the `by` field
+        },
+      },
+      {
+        $sort: { date: -1 } // Optional: sort by date in descending order
+      }
+    ]).exec();
+    console.log(data, 'data');
+
+    return res.json({ data });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({ message: "Server error", error });
   }
-
-  return res.json({ data });
 });
+
 
 module.exports = {
   createMonthlyExpenseController,
-  getExpenseList,
+  getExpenseListController,
   createExpenseHeaderController,
   getExpenseHeadListController
 };

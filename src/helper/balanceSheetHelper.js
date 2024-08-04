@@ -14,6 +14,46 @@ const {
     expenseLiabilityHelper,
     liabilityAssetHelper
 } = require("./reportHepler");
+function getCommonHeadDetails(assetResult, liabilityResult) {
+
+
+    // Create a map to store sums of headIds from liabilityResult
+    const headSums = new Map();
+    let total = 0;
+    // Process liabilityResult
+    liabilityResult.forEach(item => {
+        if (!headSums.has(item._id.toString())) {
+            total += item.totalSum;
+            headSums.set(item._id.toString(), { headName: item.headName, totalSum: item.totalSum });
+        } else {
+            total += item.totalSum;
+            headSums.get(item._id.toString()).totalSum += item.totalSum;
+        }
+    });
+
+    // Process assetResult and find common headIds
+    assetResult.forEach(item => {
+        if (!headSums.has(item._id.toString())) {
+            total += item.totalSum;
+            headSums.set(item._id.toString(), { headName: item.headName, totalSum: item.totalSum });
+        } else {
+            total += item.totalSum;
+            headSums.get(item._id.toString()).totalSum += item.totalSum;
+        }
+    });
+
+    // Prepare the final result
+    const commonHeadDetails = [];
+    headSums.forEach((value, key) => {
+        commonHeadDetails.push({
+            name: value.headName,
+            amount: value.totalSum
+        });
+    });
+    console.log(total, 'total');
+
+    return [commonHeadDetails, total];
+}
 
 async function generateBalanceSheet(from, to) {
     const [
@@ -57,11 +97,15 @@ async function generateBalanceSheet(from, to) {
         retainedEarnings: incomeVsExpense.netIncome
     };
     const assetLiabilitySum = liabilityAsset.reduce((sum, asset) => sum + asset.totalSum, 0);
+    const [finalAssets, total] = getCommonHeadDetails(assets, liabilityAsset);
     const newEquity = donation.map((donation) => ({ name: `${donation.name} (Donation)`, amount: donation.amount }));
-    const totalAssets = drawerCash + bankCash + loanInField + assets.reduce((sum, asset) => sum + asset.totalSum, 0) + assetLiabilitySum;
+    const totalAssets = drawerCash + bankCash + loanInField + total;
     const totalEquity = equity.initialCapital + equity.donatedCapital + Math.abs(equity.retainedEarnings);
-
     const totalLiabilitiesAndEquity = employeeSecurityFund + memberSavingsAccount + fdrAccount + dpsAccount + ngoLoanReceived + totalEquity + expenseLiability + assetLiabilitySum;
+
+
+
+
 
     return {
         assets: {
@@ -70,7 +114,7 @@ async function generateBalanceSheet(from, to) {
                 { name: "Cash at Bank", amount: bankCash },
                 { name: "Loans Receivable", amount: loanInField }
             ],
-            fixedAssets: assets.map(asset => ({ name: asset.headName, amount: asset.totalSum })),
+            fixedAssets: finalAssets,
             provisionOfExpenses: [
                 { name: "Expenses", amount: expenseLiability },
 
