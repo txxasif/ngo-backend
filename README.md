@@ -31,6 +31,7 @@ This audit-based software is designed to manage and track user loans, savings, F
 ### Dashboard
 
 ![Screenshot 2024-06-10 130726](https://github.com/txxasif/ngo-backend/assets/54706529/75ac4265-9454-4733-8d4c-f82961eb10a5)
+![screencapture-ngo-project-one-vercel-app-income-vs-expense-2024-08-11-21_10_09](https://github.com/user-attachments/assets/f80a0ed0-05c3-4f8d-8537-3eee3ebefc79)
 
 ![screencapture-ngo-project-one-vercel-app-balance-sheet-2024-08-11-21_05_46](https://github.com/user-attachments/assets/353442c7-f5b0-48f8-bd9b-3ba89b703746)
 ![screencapture-ngo-project-one-vercel-app-balance-sheet-2024-08-11-21_05_46](https://github.com/user-attachments/assets/78fe862c-f45e-4ef3-ab3c-fd9f4044019d)
